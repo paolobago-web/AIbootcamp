@@ -38,3 +38,6 @@ pip install -r requirements.txt
 ## Deployment
 
 This repo is connected to Vercel — pushes to `main` deploy automatically. `vercel.json` points Vercel at `frontend/` as the site root, so no dashboard build configuration is needed beyond the initial GitHub connection.
+
+
+_Auto-deploy verified 2026-07-29T13:12:11Z_
