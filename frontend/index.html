@@ -3,123 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LootBX — Command Deck</title>
+<title>FRIDAY — Business Operating System</title>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <svg style="display:none" aria-hidden="true">
-  <symbol id="ic-sword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5L20.5 9.5 10 20l-4-4z"/><path d="M7 17l-4 4"/><path d="M13 6l5 5"/></symbol>
-  <symbol id="ic-shieldeq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
-  <symbol id="ic-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 5.5V20.5"/></symbol>
-  <symbol id="ic-medal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><path d="M9 3l3 6 3-6"/></symbol>
-  <symbol id="ic-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
-  <symbol id="ic-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
-  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
-  <symbol id="ic-unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 017.8-1.3"/></symbol>
+  <symbol id="ic-overview" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></symbol>
+  <symbol id="ic-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+  <symbol id="ic-work" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M15 3v4h4"/><path d="M9 12.5h6M9 15.5h6M9 9.5h3"/></symbol>
+  <symbol id="ic-coaching" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.2 8.8l-2 5-5 2 2-5z"/></symbol>
+  <symbol id="ic-finance" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M3 13h18"/><circle cx="12" cy="15.5" r="1.3"/><path d="M8 9V7a4 4 0 018 0v2"/></symbol>
+  <symbol id="ic-reports" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V4M16 20v-6"/><path d="M2 20h20"/></symbol>
+  <symbol id="ic-codex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 5.5V20.5"/></symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="ic-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
+  <symbol id="ic-unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 017.8-1.3"/></symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.6L20 9.3l-4 4 1 5.7-5-2.9-5 2.9 1-5.7-4-4 5.5-.7z"/></symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 004 0"/></symbol>
 </svg>
 
-<div class="shell">
+<div class="app-shell">
 
-  <header class="topbar">
+  <header class="top-header">
     <div class="brand">
-      <div class="mark">Loot<span>BX</span> Command Deck</div>
-      <div class="sub">Two things worth watching: the people, and the work</div>
-    </div>
-    <div class="mode-switch" role="tablist" aria-label="Deck">
-      <button class="mode-tab party-tab active" id="tabPartyBtn" role="tab" aria-selected="true"><span class="dot"></span>People</button>
-      <button class="mode-tab ops-tab" id="tabOpsBtn" role="tab" aria-selected="false"><span class="dot"></span>The Work</button>
+      <div class="wordmark">FRIDAY</div>
+      <div class="tagline">People. Work. Progress.</div>
     </div>
     <div class="clock">Wed · Jul 29, 2026 · Session live</div>
   </header>
 
-  <!-- ================= PARTY VIEW ================= -->
-  <main class="mode-view party-mode" id="partyView">
-    <section class="kpi-row" id="peopleKpiRow"></section>
-    <section class="ops-grid">
-      <div class="panel" id="recognizePanel"></div>
-      <div class="panel" id="coachPriorityPanel"></div>
-    </section>
-    <div class="party-layout">
-      <div>
-        <div class="panel" style="margin-bottom:12px;">
-          <div class="rail-head"><span class="rail-title">Active Party — needs attention</span><span class="rail-count" id="activeCount"></span></div>
-          <div class="slot-list" id="slotList"></div>
-        </div>
-        <div class="panel">
-          <div class="rail-head"><span class="rail-title">Reserve — steady</span><span class="rail-count" id="reserveCount"></span></div>
-          <div class="roster-tiles" id="reserveTiles"></div>
-        </div>
+  <!-- ================= OVERVIEW ================= -->
+  <main class="section-view" id="view-overview">
+    <section class="kpi-row" id="ovKpiRow"></section>
+    <div class="overview-layout" style="margin-top:14px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <section class="grid-2">
+          <div class="frame" id="ovRecognition"></div>
+          <div class="frame" id="ovCoachingPriority"></div>
+        </section>
+        <section class="frame">
+          <div class="frame-head"><h3>Needs Attention</h3><div class="hint">Live roster status</div></div>
+          <div class="list-rows" id="ovAttentionList"></div>
+        </section>
+        <section class="frame">
+          <div class="frame-head"><h3>Business Alerts</h3><div class="hint">Governance &amp; compliance</div></div>
+          <div class="list-rows" id="ovAlertsList"></div>
+        </section>
       </div>
-
-      <div class="panel detail-panel" id="detailPanel"></div>
+      <aside style="display:flex;flex-direction:column;gap:14px;">
+        <div class="frame">
+          <div class="frame-head"><h3>Quick Intelligence</h3><div class="hint">Right now</div></div>
+          <div class="record-kv" id="ovQuickIntel"></div>
+        </div>
+        <div class="frame">
+          <div class="frame-head"><h3>Notifications</h3><div class="hint" id="ovNotifCount"></div></div>
+          <div class="list-rows" id="ovNotifications"></div>
+        </div>
+      </aside>
     </div>
-    <p class="footnote">Sample roster — illustrative placeholder data for prototyping. "Active Party" is computed from live status (blocked/overloaded first), not a fixed org list. Coaching quests and Personal Record entries you add persist only for this browser session — the "Reveal Personal Record" gate is a UI convention here, not real access control; that requires the backend's role check (see ../backend).</p>
   </main>
 
-  <!-- ================= OPS VIEW ================= -->
-  <main class="mode-view ops-mode" id="opsView" hidden>
-    <section class="kpi-row" id="opsKpiRow"></section>
-
-    <section class="ops-grid">
-      <div class="panel span2">
-        <div class="panel-head"><h3>Finance &amp; P&amp;L — last 6 months</h3><div class="hint">$K / month</div></div>
-        <div class="legend-row">
-          <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>Revenue</span>
-          <span class="legend-item"><span class="legend-swatch" style="background:#5c7ea3"></span>Expenses</span>
+  <!-- ================= PEOPLE ================= -->
+  <main class="section-view" id="view-people" hidden>
+    <div class="people-layout">
+      <div>
+        <div class="frame" style="margin-bottom:12px;">
+          <div class="rail-head"><span class="rail-title">Needs Attention</span><span class="rail-count" id="peopleActiveCount"></span></div>
+          <div class="list-rows" id="peopleActiveList" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
-        <div class="chart-svg-wrap" id="plChart"></div>
+        <div class="frame">
+          <div class="rail-head"><span class="rail-title">Steady</span><span class="rail-count" id="peopleBenchCount"></span></div>
+          <div class="bench-tiles" id="peopleBenchTiles"></div>
+        </div>
       </div>
+      <div class="frame profile-panel" id="profilePanel"></div>
+    </div>
+    <p class="footnote" style="margin-top:14px;">Sample roster — illustrative placeholder data for prototyping. Coaching quests and Personal Record entries you add persist only for this browser session.</p>
+  </main>
 
-      <div class="panel">
-        <div class="panel-head"><h3>Expense Breakdown — Jul</h3><div class="hint" id="expenseTotalHint"></div></div>
-        <div class="seq-bars" id="expenseBars"></div>
+  <!-- ================= WORK ================= -->
+  <main class="section-view" id="view-work" hidden>
+    <section class="kpi-row" id="workKpiRow"></section>
+    <section class="grid-2" style="margin-top:14px;">
+      <div class="frame span-2">
+        <div class="frame-head"><h3>Active Missions</h3><div class="hint">Priority-ranked</div></div>
+        <div id="workProjectList" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Monthly Subscriptions</h3><div class="hint" id="subsTotalHint"></div></div>
-        <div class="list-rows" id="subsList"></div>
+      <div class="frame">
+        <div class="frame-head"><h3>Company Activity</h3><div class="hint">Meetings + work moving</div></div>
+        <div class="list-rows" id="workActivity"></div>
       </div>
-
-      <div class="panel span2">
-        <div class="panel-head"><h3>Company Activity</h3><div class="hint">Meetings set + work moving</div></div>
-        <div class="list-rows" id="activityFeed"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Infractions &amp; Compliance</h3><div class="hint" id="complianceCountHint"></div></div>
-        <div class="list-rows" id="complianceList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Notifications &amp; Approvals</h3><div class="hint">Pending queue</div></div>
-        <div class="list-rows" id="approvalList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Goals &amp; Objectives</h3><div class="hint">Lowest progress first</div></div>
-        <div id="goalList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Documents &amp; Assets</h3><div class="hint">Expiring / renewing soon</div></div>
-        <div class="list-rows" id="docList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Reports &amp; Analytics</h3><div class="hint">Quick reference</div></div>
-        <div class="report-tiles" id="reportTiles"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h3>Organization Management</h3><div class="hint">Reporting lines</div></div>
-        <div class="org-mini" id="orgMini"></div>
+      <div class="frame">
+        <div class="frame-head"><h3>Compliance &amp; Governance</h3><div class="hint" id="workComplianceHint"></div></div>
+        <div class="list-rows" id="workCompliance"></div>
       </div>
     </section>
-    <p class="footnote">Finance, compliance, document, attendance and turnover figures are illustrative placeholders for prototyping — wire to real payroll/finance/legal/HRIS sources before relying on them.</p>
+  </main>
+
+  <!-- ================= COACHING ================= -->
+  <main class="section-view" id="view-coaching" hidden>
+    <section class="grid-2">
+      <div class="frame" id="coachRecognition"></div>
+      <div class="frame" id="coachPriority"></div>
+    </section>
+    <section class="frame" style="margin-top:14px;">
+      <div class="frame-head"><h3>Active Coaching Across the Org</h3><div class="hint" id="coachActiveHint"></div></div>
+      <div id="coachActiveList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </section>
+    <section class="frame" style="margin-top:14px;">
+      <div class="frame-head"><h3>Coaching History</h3><div class="hint">Closed with a logged outcome</div></div>
+      <div id="coachHistoryList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </section>
+  </main>
+
+  <!-- ================= FINANCE ================= -->
+  <main class="section-view" id="view-finance" hidden>
+    <section class="kpi-row" id="financeKpiRow"></section>
+    <section class="grid-2" style="margin-top:14px;">
+      <div class="frame span-2">
+        <div class="frame-head"><h3>Revenue vs. Expenses — 6 Months</h3><div class="hint">$K / month</div></div>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Revenue</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--cyan)"></span>Expenses</span>
+        </div>
+        <div class="chart-svg-wrap" id="financeChart"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Expense Breakdown</h3><div class="hint" id="financeExpenseHint"></div></div>
+        <div class="seq-bars" id="financeExpenseBars"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Monthly Subscriptions</h3><div class="hint" id="financeSubsHint"></div></div>
+        <div class="list-rows" id="financeSubsList"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= REPORTS ================= -->
+  <main class="section-view" id="view-reports" hidden>
+    <section class="grid-2">
+      <div class="frame">
+        <div class="frame-head"><h3>Key Indicators</h3><div class="hint">This quarter</div></div>
+        <div class="kpi-row" id="reportsTiles" style="grid-template-columns:repeat(2,1fr);"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Organization</h3><div class="hint">Reporting lines</div></div>
+        <div class="org-mini" id="reportsOrgMini"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Goals &amp; Objectives</h3><div class="hint">Lowest progress first</div></div>
+        <div id="reportsGoals"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Documents &amp; Assets</h3><div class="hint">Expiring / renewing soon</div></div>
+        <div class="list-rows" id="reportsDocs"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= CODEX ================= -->
+  <main class="section-view" id="view-codex" hidden>
+    <div class="grid-2">
+      <div class="frame">
+        <div class="frame-head"><h3>Status Indicators</h3><div class="hint">What each reading means</div></div>
+        <div id="codexStatus"></div>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3>Core Attributes</h3><div class="hint">The six axes on every radar</div></div>
+        <div id="codexAttributes"></div>
+      </div>
+      <div class="frame span-2">
+        <div class="frame-head"><h3>Skill Categories</h3><div class="hint">How individual skills are grouped</div></div>
+        <div id="codexSkills"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= SETTINGS ================= -->
+  <main class="section-view" id="view-settings" hidden>
+    <div class="frame">
+      <div class="frame-head"><h3>Settings</h3><div class="hint">Not yet wired up</div></div>
+      <p class="placeholder-note">FRIDAY doesn't have real accounts, auth, or a backend yet — this is a front-end prototype running on sample data in your browser. Settings (roles, notification preferences, data sources, integrations) will live here once that foundation exists. Saying so plainly beats a settings screen that pretends to save something it can't.</p>
+    </div>
   </main>
 
 </div>
+
+<nav class="command-bar" aria-label="Primary navigation">
+  <div class="command-bar-inner" id="commandBar"></div>
+</nav>
 
 <script src="js/app.js"></script>
 </body>
