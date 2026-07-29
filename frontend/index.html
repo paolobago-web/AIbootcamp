@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LootBX — Command Deck</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-sword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5L20.5 9.5 10 20l-4-4z"/><path d="M7 17l-4 4"/><path d="M13 6l5 5"/></symbol>
+  <symbol id="ic-shieldeq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+  <symbol id="ic-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 5.5V20.5"/></symbol>
+  <symbol id="ic-medal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><path d="M9 3l3 6 3-6"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="ic-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
+  <symbol id="ic-unlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 017.8-1.3"/></symbol>
+</svg>
+
+<div class="shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">Loot<span>BX</span> Command Deck</div>
+      <div class="sub">Two things worth watching: the people, and the work</div>
+    </div>
+    <div class="mode-switch" role="tablist" aria-label="Deck">
+      <button class="mode-tab party-tab active" id="tabPartyBtn" role="tab" aria-selected="true"><span class="dot"></span>People</button>
+      <button class="mode-tab ops-tab" id="tabOpsBtn" role="tab" aria-selected="false"><span class="dot"></span>The Work</button>
+    </div>
+    <div class="clock">Wed · Jul 29, 2026 · Session live</div>
+  </header>
+
+  <!-- ================= PARTY VIEW ================= -->
+  <main class="mode-view party-mode" id="partyView">
+    <section class="kpi-row" id="peopleKpiRow"></section>
+    <section class="ops-grid">
+      <div class="panel" id="recognizePanel"></div>
+      <div class="panel" id="coachPriorityPanel"></div>
+    </section>
+    <div class="party-layout">
+      <div>
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="rail-head"><span class="rail-title">Active Party — needs attention</span><span class="rail-count" id="activeCount"></span></div>
+          <div class="slot-list" id="slotList"></div>
+        </div>
+        <div class="panel">
+          <div class="rail-head"><span class="rail-title">Reserve — steady</span><span class="rail-count" id="reserveCount"></span></div>
+          <div class="roster-tiles" id="reserveTiles"></div>
+        </div>
+      </div>
+
+      <div class="panel detail-panel" id="detailPanel"></div>
+    </div>
+    <p class="footnote">Sample roster — illustrative placeholder data for prototyping. "Active Party" is computed from live status (blocked/overloaded first), not a fixed org list. Coaching quests and Personal Record entries you add persist only for this browser session — the "Reveal Personal Record" gate is a UI convention here, not real access control; that requires the backend's role check (see ../backend).</p>
+  </main>
+
+  <!-- ================= OPS VIEW ================= -->
+  <main class="mode-view ops-mode" id="opsView" hidden>
+    <section class="kpi-row" id="opsKpiRow"></section>
+
+    <section class="ops-grid">
+      <div class="panel span2">
+        <div class="panel-head"><h3>Finance &amp; P&amp;L — last 6 months</h3><div class="hint">$K / month</div></div>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>Revenue</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#5c7ea3"></span>Expenses</span>
+        </div>
+        <div class="chart-svg-wrap" id="plChart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Expense Breakdown — Jul</h3><div class="hint" id="expenseTotalHint"></div></div>
+        <div class="seq-bars" id="expenseBars"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Monthly Subscriptions</h3><div class="hint" id="subsTotalHint"></div></div>
+        <div class="list-rows" id="subsList"></div>
+      </div>
+
+      <div class="panel span2">
+        <div class="panel-head"><h3>Company Activity</h3><div class="hint">Meetings set + work moving</div></div>
+        <div class="list-rows" id="activityFeed"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Infractions &amp; Compliance</h3><div class="hint" id="complianceCountHint"></div></div>
+        <div class="list-rows" id="complianceList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Notifications &amp; Approvals</h3><div class="hint">Pending queue</div></div>
+        <div class="list-rows" id="approvalList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Goals &amp; Objectives</h3><div class="hint">Lowest progress first</div></div>
+        <div id="goalList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Documents &amp; Assets</h3><div class="hint">Expiring / renewing soon</div></div>
+        <div class="list-rows" id="docList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Reports &amp; Analytics</h3><div class="hint">Quick reference</div></div>
+        <div class="report-tiles" id="reportTiles"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Organization Management</h3><div class="hint">Reporting lines</div></div>
+        <div class="org-mini" id="orgMini"></div>
+      </div>
+    </section>
+    <p class="footnote">Finance, compliance, document, attendance and turnover figures are illustrative placeholders for prototyping — wire to real payroll/finance/legal/HRIS sources before relying on them.</p>
+  </main>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
