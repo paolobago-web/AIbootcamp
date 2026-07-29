@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LootBX — Command Deck</title>
+<style>
+  :root {
+    --ground: #0a1119;
+    --surface: #101a26;
+    --surface-raised: #142235;
+    --surface-hover: #1c2f45;
+    --border: #28405c;
+    --border-strong: #3c5c82;
+    --text-primary: #eaf2fa;
+    --text-secondary: #9fb4c9;
+    --text-muted: #63788f;
+    --good: #4fae7a;
+    --good-soft: rgba(79, 174, 122, 0.16);
+    --warning: #d99a3e;
+    --warning-soft: rgba(217, 154, 62, 0.16);
+    --critical: #dd5b48;
+    --critical-soft: rgba(221, 91, 72, 0.16);
+    --radius: 10px;
+    --font-display: "Segoe UI", ui-sans-serif, system-ui, Arial, sans-serif;
+    --font-body: -apple-system, "Segoe UI", ui-sans-serif, system-ui, Helvetica, Arial, sans-serif;
+    --font-data: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+    /* mode accents — overridden per view container */
+    --party-accent: #43d8d0;
+    --party-accent-strong: #86f2ea;
+    --party-accent-ink: #06201d;
+    --party-accent-soft: rgba(67, 216, 208, 0.14);
+
+    --ops-accent: #e4b24a;
+    --ops-accent-strong: #f4c463;
+    --ops-accent-ink: #251a04;
+    --ops-accent-soft: rgba(228, 178, 74, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background:
+      radial-gradient(1100px 560px at 12% -8%, rgba(67,216,208,0.06), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(228,178,74,0.05), transparent 55%),
+      var(--ground);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+  button { cursor: pointer; font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--accent-strong, #86f2ea); outline-offset: 2px; }
+
+  .shell { max-width: 1280px; margin: 0 auto; padding: 24px 20px 80px; display: flex; flex-direction: column; gap: 22px; }
+
+  /* ---------- panel frame ---------- */
+  .panel { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+  .panel::before, .panel::after { content: ""; position: absolute; width: 10px; height: 10px; pointer-events: none; opacity: 0.9; }
+  .panel::before { top: -1px; left: -1px; border-top: 2px solid var(--accent, var(--party-accent)); border-left: 2px solid var(--accent, var(--party-accent)); border-top-left-radius: 3px; }
+  .panel::after { bottom: -1px; right: -1px; border-bottom: 2px solid var(--accent, var(--party-accent)); border-right: 2px solid var(--accent, var(--party-accent)); border-bottom-right-radius: 3px; }
+
+  .eyebrow { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+
+  /* ---------- topbar + mode switch ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .brand { display: flex; flex-direction: column; gap: 3px; }
+  .brand .mark { font-family: var(--font-display); font-weight: 800; letter-spacing: 0.07em; font-size: 24px; text-transform: uppercase; }
+  .brand .mark span { color: var(--party-accent); }
+  .brand .sub { color: var(--text-secondary); font-size: 12.5px; }
+
+  .mode-switch { display: flex; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+  body.ops-active .mode-switch { --accent-strong: var(--ops-accent-strong); }
+  .mode-tab { border: none; background: transparent; color: var(--text-secondary); font-family: var(--font-display); font-weight: 700; font-size: 12.5px; letter-spacing: 0.04em; padding: 8px 16px; border-radius: 999px; display: flex; align-items: center; gap: 7px; transition: background 140ms ease, color 140ms ease; }
+  .mode-tab .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.55; }
+  .mode-tab.party-tab.active { background: var(--party-accent-soft); color: var(--party-accent-strong); }
+  .mode-tab.ops-tab.active { background: var(--ops-accent-soft); color: var(--ops-accent-strong); }
+  .mode-tab:not(.active):hover { color: var(--text-primary); }
+
+  .topbar .clock { color: var(--text-muted); font-size: 11.5px; font-family: var(--font-data); }
+
+  .mode-view[hidden] { display: none; }
+
+  /* ================= PARTY MODE ================= */
+  .party-mode { --accent: var(--party-accent); --accent-strong: var(--party-accent-strong); --accent-ink: var(--party-accent-ink); --accent-soft: var(--party-accent-soft); display: flex; flex-direction: column; gap: 18px; }
+
+  .party-layout { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 880px) { .party-layout { grid-template-columns: 1fr; } }
+
+  .rail-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .rail-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-strong); }
+  .rail-count { font-family: var(--font-data); font-size: 11px; color: var(--text-muted); }
+
+  .slot-list { display: flex; flex-direction: column; gap: 8px; }
+  .slot-card { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); transition: border-color 130ms ease, background 130ms ease; }
+  .slot-card:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+  .slot-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .slot-num { width: 20px; height: 20px; border-radius: 5px; background: var(--accent); color: var(--accent-ink); font-family: var(--font-data); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .portrait { width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 800; font-size: 12px; color: var(--accent-ink); background: linear-gradient(155deg, var(--accent-strong), var(--accent)); border: 1px solid rgba(255,255,255,0.25); }
+  .slot-meta { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .slot-name-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .slot-name { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slot-lv { font-family: var(--font-data); font-size: 10.5px; color: var(--text-muted); flex: 0 0 auto; }
+  .mini-bars { display: flex; flex-direction: column; gap: 2px; }
+  .mini-track { height: 4px; border-radius: 3px; background: rgba(159,180,201,0.14); overflow: hidden; }
+  .mini-fill { display: block; height: 100%; }
+  .mini-fill.hp { background: linear-gradient(90deg, #2f7a52, var(--good)); }
+  .mini-fill.hp.warn { background: linear-gradient(90deg, #a6672f, var(--warning)); }
+  .mini-fill.hp.crit { background: linear-gradient(90deg, #a3402c, var(--critical)); }
+  .mini-fill.sp { background: linear-gradient(90deg, #2f6a86, #4fb8dc); }
+  .badge-tag { font-family: var(--font-data); font-size: 9px; font-weight: 700; letter-spacing: 0.03em; padding: 1px 6px; border-radius: 4px; flex: 0 0 auto; }
+  .badge-tag.urgent { color: var(--critical); background: var(--critical-soft); }
+  .badge-tag.steady { color: var(--good); background: var(--good-soft); }
+
+  .roster-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .roster-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; color: var(--text-primary); transition: border-color 130ms ease, background 130ms ease; }
+  .roster-tile:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+  .roster-tile.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .roster-tile .portrait { width: 40px; height: 40px; font-size: 13px; }
+  .roster-tile .rname { font-size: 11.5px; font-weight: 700; text-align: center; }
+  .roster-tile .rrole { font-size: 10px; color: var(--text-muted); text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ---- detail panel ---- */
+  .detail-panel { display: flex; flex-direction: column; gap: 14px; }
+  .detail-header { display: flex; gap: 14px; align-items: center; }
+  .detail-portrait { width: 68px; height: 68px; border-radius: 14px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 800; font-size: 22px; color: var(--accent-ink); background: linear-gradient(155deg, var(--accent-strong), var(--accent)); border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 0 0 1px var(--border), 0 0 24px -6px var(--accent); }
+  .detail-id { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .detail-name { font-size: 19px; font-weight: 800; }
+  .detail-role { font-size: 12.5px; color: var(--text-secondary); }
+  .detail-flavor { font-size: 11.5px; color: var(--text-muted); font-style: italic; }
+  .detail-lv { font-family: var(--font-data); font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent); padding: 3px 9px; border-radius: 6px; flex: 0 0 auto; align-self: flex-start; }
+
+  .status-bar-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .status-bar { display: flex; flex-direction: column; gap: 3px; }
+  .status-bar-label { display: flex; justify-content: space-between; font-family: var(--font-data); font-size: 10.5px; color: var(--text-muted); }
+  .bar-track { height: 8px; border-radius: 4px; background: rgba(159,180,201,0.14); overflow: hidden; }
+  .bar-fill { display: block; height: 100%; border-radius: 4px; }
+
+  /* tab bar w/ shoulder pills */
+  .tab-nav { display: flex; align-items: center; gap: 8px; }
+  .shoulder-btn { background: var(--surface-raised); border: 1px solid var(--border); color: var(--text-secondary); font-family: var(--font-data); font-size: 10.5px; font-weight: 700; padding: 5px 8px; border-radius: 6px; flex: 0 0 auto; }
+  .shoulder-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
+  .tab-bar { display: flex; gap: 4px; flex: 1; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 3px; overflow-x: auto; }
+  .tab-btn { flex: 1; white-space: nowrap; background: transparent; border: none; color: var(--text-secondary); font-family: var(--font-display); font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em; padding: 8px 10px; border-radius: 6px; }
+  .tab-btn.active { background: var(--accent-soft); color: var(--accent-strong); }
+  .tab-btn:not(.active):hover { color: var(--text-primary); }
+
+  .tab-content { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .tab-content { grid-template-columns: 1fr; } }
+  .tab-content.single { grid-template-columns: 1fr; }
+
+  .subpanel-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-strong); margin-bottom: 10px; }
+
+  .attr-list { display: flex; flex-direction: column; }
+  .attr-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .attr-row:last-child { border-bottom: none; }
+  .attr-row .aname { color: var(--text-secondary); }
+  .attr-row .aval { font-family: var(--font-data); font-weight: 700; color: var(--text-primary); }
+
+  .radar-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .radar-wrap svg { max-width: 100%; height: auto; }
+  .radar-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 12px; width: 100%; font-size: 11px; }
+  .radar-legend-item { display: flex; justify-content: space-between; color: var(--text-muted); }
+  .radar-legend-item b { color: var(--text-primary); font-family: var(--font-data); }
+
+  .loadout-list { display: flex; flex-direction: column; }
+  .loadout-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .loadout-row:last-child { border-bottom: none; }
+  .loadout-icon { width: 26px; height: 26px; border-radius: 6px; background: var(--surface-raised); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; color: var(--accent-strong); }
+  .loadout-icon svg { width: 14px; height: 14px; }
+  .loadout-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .loadout-slot { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+  .loadout-name { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .loadout-name.empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
+  .loadout-power { font-family: var(--font-data); font-size: 12px; color: var(--accent-strong); font-weight: 700; flex: 0 0 auto; }
+
+  .buffer-line { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--text-secondary); }
+  .buffer-line b { color: var(--accent-strong); font-family: var(--font-data); }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .skill-tile { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .skill-name { font-size: 12px; font-weight: 700; }
+  .pip-row { display: flex; gap: 3px; }
+  .pip { width: 12px; height: 6px; border-radius: 2px; background: rgba(159,180,201,0.18); }
+  .pip.filled { background: var(--accent); }
+
+  .coach-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .coach-item { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; display: flex; flex-direction: column; gap: 3px; }
+  .coach-item .head { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; color: var(--accent-strong); }
+  .coach-item .evidence { font-size: 11.5px; color: var(--text-secondary); }
+  .coach-item .due { font-family: var(--font-data); font-size: 10px; color: var(--text-muted); }
+  .coach-empty { font-size: 12px; color: var(--text-muted); font-style: italic; }
+
+  .coach-form { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+  .field select, .field input, .field textarea { background: var(--ground); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; padding: 7px 9px; font-family: var(--font-body); font-size: 12.5px; }
+  .field select:focus, .field input:focus, .field textarea:focus { border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 50px; }
+  .submit-btn { background: var(--accent); color: var(--accent-ink); border: none; border-radius: 7px; padding: 9px 14px; font-weight: 700; font-size: 12.5px; font-family: var(--font-display); letter-spacing: 0.03em; }
+  .submit-btn:hover { background: var(--accent-strong); }
+
+  .roles-kv { display: flex; flex-direction: column; }
+  .kv-row { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-row .k { color: var(--text-muted); }
+  .kv-row .v { color: var(--text-primary); text-align: right; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .plain-chip { font-size: 11px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; color: var(--text-secondary); }
+
+  /* ================= OPS MODE ================= */
+  .ops-mode { --accent: var(--ops-accent); --accent-strong: var(--ops-accent-strong); --accent-ink: var(--ops-accent-ink); --accent-soft: var(--ops-accent-soft); display: flex; flex-direction: column; gap: 18px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 15px; display: flex; flex-direction: column; gap: 5px; }
+  .kpi .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; }
+  .kpi .value-row { display: flex; align-items: baseline; gap: 8px; }
+  .kpi .value { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 600; }
+  .kpi .delta { font-size: 11.5px; font-family: var(--font-data); padding: 1px 6px; border-radius: 5px; }
+  .delta.good { color: var(--good); background: var(--good-soft); }
+  .delta.warning { color: var(--warning); background: var(--warning-soft); }
+  .delta.flat { color: var(--text-muted); background: rgba(99,120,143,0.16); }
+
+  .ops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .ops-grid { grid-template-columns: 1fr; } }
+  .ops-grid .span2 { grid-column: 1 / -1; }
+
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .panel-head h3 { font-size: 13px; letter-spacing: 0.04em; }
+  .panel-head .hint { font-size: 11px; color: var(--text-muted); font-family: var(--font-data); }
+
+  .chart-svg-wrap { overflow-x: auto; }
+  .legend-row { display: flex; gap: 14px; margin-bottom: 10px; font-size: 11.5px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+
+  .seq-bars { display: flex; flex-direction: column; gap: 10px; }
+  .seq-row { display: flex; flex-direction: column; gap: 3px; }
+  .seq-label-row { display: flex; justify-content: space-between; font-size: 12px; }
+  .seq-label-row .n { color: var(--text-secondary); }
+  .seq-label-row .v { font-family: var(--font-data); color: var(--text-primary); font-weight: 600; }
+  .seq-track { height: 10px; border-radius: 5px; background: rgba(159,180,201,0.12); overflow: hidden; }
+  .seq-fill { height: 100%; border-radius: 5px; }
+
+  .list-rows { display: flex; flex-direction: column; }
+  .list-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .stripe { width: 3px; align-self: stretch; border-radius: 2px; flex: 0 0 auto; }
+  .stripe.good { background: var(--good); } .stripe.warning { background: var(--warning); } .stripe.critical { background: var(--critical); }
+  .list-row .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .list-row .title { font-size: 12.5px; font-weight: 600; }
+  .list-row .sub { font-size: 11.5px; color: var(--text-muted); }
+  .list-row .tag { font-family: var(--font-data); font-size: 10px; padding: 2px 7px; border-radius: 5px; flex: 0 0 auto; align-self: center; }
+  .tag.good { color: var(--good); background: var(--good-soft); } .tag.warning { color: var(--warning); background: var(--warning-soft); } .tag.critical { color: var(--critical); background: var(--critical-soft); }
+
+  .goal-row { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .goal-row:last-child { border-bottom: none; }
+  .goal-top { display: flex; justify-content: space-between; font-size: 12.5px; }
+  .goal-top .owner { color: var(--text-muted); font-size: 11px; }
+
+  .report-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .report-tile { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 3px; }
+  .report-tile .rt-label { font-size: 11px; color: var(--text-muted); }
+  .report-tile .rt-value { font-family: var(--font-data); font-size: 19px; font-weight: 700; }
+
+  .org-mini { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .org-node { border: 1px solid var(--border); background: var(--surface-raised); border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 700; text-align: center; }
+  .org-branches { display: flex; gap: 24px; position: relative; padding-top: 18px; }
+  .org-branches::before { content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 18px; background: var(--border-strong); }
+  .org-col { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+  .org-col::before { content: ""; position: absolute; top: -18px; left: 50%; width: 1px; height: 18px; background: var(--border-strong); }
+  .org-leaf-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 220px; }
+  .org-leaf { font-size: 10.5px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; color: var(--text-secondary); }
+  .org-leaf.sub { border-style: dashed; }
+
+  .footnote { font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 14px; }
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="ic-sword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5L20.5 9.5 10 20l-4-4z"/><path d="M7 17l-4 4"/><path d="M13 6l5 5"/></symbol>
+  <symbol id="ic-shieldeq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+  <symbol id="ic-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 5.5V20.5"/></symbol>
+  <symbol id="ic-medal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="6"/><path d="M9 3l3 6 3-6"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></symbol>
+  <symbol id="ic-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
+</svg>
+
+<div class="shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">Loot<span>BX</span> Command Deck</div>
+      <div class="sub">Two things worth watching: the people, and the work</div>
+    </div>
+    <div class="mode-switch" role="tablist" aria-label="Deck">
+      <button class="mode-tab party-tab active" id="tabPartyBtn" role="tab" aria-selected="true"><span class="dot"></span>People</button>
+      <button class="mode-tab ops-tab" id="tabOpsBtn" role="tab" aria-selected="false"><span class="dot"></span>The Work</button>
+    </div>
+    <div class="clock">Wed · Jul 29, 2026 · Session live</div>
+  </header>
+
+  <!-- ================= PARTY VIEW ================= -->
+  <main class="mode-view party-mode" id="partyView">
+    <section class="kpi-row" id="peopleKpiRow"></section>
+    <section class="ops-grid">
+      <div class="panel" id="recognizePanel"></div>
+      <div class="panel" id="coachPriorityPanel"></div>
+    </section>
+    <div class="party-layout">
+      <div>
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="rail-head"><span class="rail-title">Active Party — needs attention</span><span class="rail-count" id="activeCount"></span></div>
+          <div class="slot-list" id="slotList"></div>
+        </div>
+        <div class="panel">
+          <div class="rail-head"><span class="rail-title">Reserve — steady</span><span class="rail-count" id="reserveCount"></span></div>
+          <div class="roster-tiles" id="reserveTiles"></div>
+        </div>
+      </div>
+
+      <div class="panel detail-panel" id="detailPanel"></div>
+    </div>
+    <p class="footnote">Sample roster — illustrative placeholder data for prototyping. "Active Party" is computed from live status (blocked/overloaded first), not a fixed org list. Coaching quests you assign persist only for this browser session.</p>
+  </main>
+
+  <!-- ================= OPS VIEW ================= -->
+  <main class="mode-view ops-mode" id="opsView" hidden>
+    <section class="kpi-row" id="opsKpiRow"></section>
+
+    <section class="ops-grid">
+      <div class="panel span2">
+        <div class="panel-head"><h3>Finance &amp; P&amp;L — last 6 months</h3><div class="hint">$K / month</div></div>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>Revenue</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#5c7ea3"></span>Expenses</span>
+        </div>
+        <div class="chart-svg-wrap" id="plChart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Expense Breakdown — Jul</h3><div class="hint" id="expenseTotalHint"></div></div>
+        <div class="seq-bars" id="expenseBars"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Monthly Subscriptions</h3><div class="hint" id="subsTotalHint"></div></div>
+        <div class="list-rows" id="subsList"></div>
+      </div>
+
+      <div class="panel span2">
+        <div class="panel-head"><h3>Company Activity</h3><div class="hint">Meetings set + work moving</div></div>
+        <div class="list-rows" id="activityFeed"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Infractions &amp; Compliance</h3><div class="hint" id="complianceCountHint"></div></div>
+        <div class="list-rows" id="complianceList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Notifications &amp; Approvals</h3><div class="hint">Pending queue</div></div>
+        <div class="list-rows" id="approvalList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Goals &amp; Objectives</h3><div class="hint">Lowest progress first</div></div>
+        <div id="goalList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Documents &amp; Assets</h3><div class="hint">Expiring / renewing soon</div></div>
+        <div class="list-rows" id="docList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Reports &amp; Analytics</h3><div class="hint">Quick reference</div></div>
+        <div class="report-tiles" id="reportTiles"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Organization Management</h3><div class="hint">Reporting lines</div></div>
+        <div class="org-mini" id="orgMini"></div>
+      </div>
+    </section>
+    <p class="footnote">Finance, compliance, document, attendance and turnover figures are illustrative placeholders for prototyping — wire to real payroll/finance/legal/HRIS sources before relying on them.</p>
+  </main>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STATS = ["Execution", "Craft", "Communication", "Resilience", "Strategy", "Adaptability"];
+
+  var people = [
+    { id:"mara", name:"Mara Okoye", role:"Senior Tech Lead", cls:"Architect-Mage", level:14,
+      hp:62, hpMax:100, sp:40, spMax:100,
+      stats:{Execution:85,Craft:88,Communication:62,Resilience:58,Strategy:66,Adaptability:71},
+      resistances:{Ambiguity:12,"Deadline Pressure":9,"Context-Switching":6,Conflict:10,Repetition:14},
+      loadout:[
+        {slot:"Primary Focus", name:"Loot Drop Socket Migration", power:18},
+        {slot:"Secondary Focus", name:"Platform Reliability", power:14},
+        {slot:"Core Toolkit", name:"Systems Architecture", power:17},
+        {slot:"Certification", name:"AWS Solutions Architect", power:12},
+        {slot:"Support Process", name:"On-call Rotation", power:10}
+      ],
+      skills:[{name:"System Design",lvl:5},{name:"Mentorship",lvl:2},{name:"Incident Response",lvl:4},{name:"Cross-team Comms",lvl:2},{name:"Roadmapping",lvl:3}],
+      roles:{reportsTo:"CTO", directReports:["2 backend engineers","1 SRE"], tenure:"3.4 yrs", orgLabel:"Tech"},
+      flavor:"Architect-Mage — turns tangled systems into clean spellwork",
+      buffer:38, quest:{title:"Loot Drop socket-service migration", progress:58},
+      struggle:"Carrying two workstreams since the QA req went unfilled",
+      nextCheckin:{date:"Jul 30", type:"1:1"},
+      infractions:[],
+      leave:{balance:9, takenYTD:6, upcoming:null},
+      coaching:[{skill:"Communication", goal:"Present the Q1 architecture review without over-explaining edge cases", evidence:"Q1 review ran 40 minutes over its slot", due:"Apr 2026", status:"completed", outcome:"Q2 review finished on time; peer feedback improved"}] },
+
+    { id:"priya", name:"Priya Anand", role:"Product Manager", cls:"Tactician", level:9,
+      hp:84, hpMax:100, sp:75, spMax:100,
+      stats:{Execution:70,Craft:75,Communication:88,Resilience:73,Strategy:78,Adaptability:80},
+      resistances:{Ambiguity:17,"Deadline Pressure":10,"Context-Switching":15,Conflict:9,Repetition:7},
+      loadout:[
+        {slot:"Primary Focus", name:"Loot Drop v2 Reward Spec", power:11},
+        {slot:"Secondary Focus", name:"Roadmap Planning", power:10},
+        {slot:"Core Toolkit", name:"Product Analytics Suite", power:12},
+        {slot:"Certification", name:"None on file", power:0},
+        {slot:"Support Process", name:"Backlog Grooming", power:8}
+      ],
+      skills:[{name:"Spec Writing",lvl:4},{name:"Prioritization",lvl:4},{name:"User Research",lvl:3},{name:"Stakeholder Alignment",lvl:4},{name:"Data Analysis",lvl:3}],
+      roles:{reportsTo:"CTO", directReports:[], tenure:"1.9 yrs", orgLabel:"Product"},
+      flavor:"Tactician — sequences the plan so nobody's blocked twice",
+      buffer:66, quest:{title:"Loot Drop v2 reward-type expansion spec", progress:35},
+      struggle:null, nextCheckin:{date:"Aug 4", type:"goal review"},
+      infractions:[],
+      leave:{balance:14, takenYTD:3, upcoming:null},
+      coaching:[] },
+
+    { id:"devon", name:"Devon Cross", role:"Product Governance Lead", cls:"Auditor-Sentinel", level:11,
+      hp:45, hpMax:100, sp:30, spMax:100,
+      stats:{Execution:60,Craft:90,Communication:58,Resilience:55,Strategy:70,Adaptability:52},
+      resistances:{Ambiguity:15,"Deadline Pressure":7,"Context-Switching":9,Conflict:8,Repetition:12},
+      loadout:[
+        {slot:"Primary Focus", name:"Loot Drop Governance Audit", power:16},
+        {slot:"Secondary Focus", name:"Admin Panel Review", power:11},
+        {slot:"Core Toolkit", name:"Code Audit Playbook", power:15},
+        {slot:"Certification", name:"Security Compliance Cert", power:13},
+        {slot:"Support Process", name:"Escalation Protocol", power:6}
+      ],
+      skills:[{name:"Root-cause Analysis",lvl:5},{name:"Technical Writing",lvl:4},{name:"Cross-team Escalation",lvl:2},{name:"Threat Modeling",lvl:3},{name:"Stakeholder Comms",lvl:2}],
+      roles:{reportsTo:"COO", directReports:[], tenure:"2.1 yrs", orgLabel:"Product Gov."},
+      flavor:"Auditor-Sentinel — finds the one path nobody tested",
+      buffer:21, quest:{title:"Reconcile winner-selection logic — claim-order vs. secure random draw (Go socket service)", progress:70},
+      struggle:"Waiting on Platform Eng for socket-service repo access, 6 days",
+      nextCheckin:{date:"Jul 31", type:"blocker review"},
+      infractions:[],
+      leave:{balance:11, takenYTD:5, upcoming:null},
+      coaching:[{skill:"Communication", goal:"Escalate cross-team blockers within 48h instead of waiting them out", evidence:"Socket-service access request sat 4 days before Devon flagged it", due:"Aug 8", status:"active"}] },
+
+    { id:"renata", name:"Renata Silva", role:"Governance Team Lead", cls:"Warden", level:13,
+      hp:71, hpMax:100, sp:58, spMax:100,
+      stats:{Execution:68,Craft:80,Communication:74,Resilience:84,Strategy:72,Adaptability:63},
+      resistances:{Ambiguity:14,"Deadline Pressure":13,"Context-Switching":10,Conflict:15,Repetition:9},
+      loadout:[
+        {slot:"Primary Focus", name:"Q3 Compliance Sweep", power:14},
+        {slot:"Secondary Focus", name:"Policy Framework", power:12},
+        {slot:"Core Toolkit", name:"Audit Checklist Suite", power:13},
+        {slot:"Certification", name:"GRC Practitioner", power:11},
+        {slot:"Support Process", name:"Incident Log Review", power:9}
+      ],
+      skills:[{name:"Policy Design",lvl:4},{name:"Cross-functional Coordination",lvl:4},{name:"Risk Assessment",lvl:5},{name:"Coaching",lvl:3},{name:"Negotiation",lvl:2}],
+      roles:{reportsTo:"COO", directReports:["Aisha Bello (HR)","Tomas Varga (Finance)","Elin Kask (Legal)"], tenure:"4.0 yrs", orgLabel:"Governance"},
+      flavor:"Warden — keeps the walls standing so everyone else can build",
+      buffer:55, quest:{title:"Q3 compliance audit sweep — HR, Finance, Legal", progress:44},
+      struggle:null, nextCheckin:{date:"Aug 6", type:"1:1"},
+      infractions:[],
+      leave:{balance:6, takenYTD:12, upcoming:null},
+      coaching:[] },
+
+    { id:"sana", name:"Sana Rocha", role:"Business Operations Lead", cls:"Ranger", level:8,
+      hp:58, hpMax:100, sp:33, spMax:100,
+      stats:{Execution:74,Craft:66,Communication:69,Resilience:57,Strategy:55,Adaptability:72},
+      resistances:{Ambiguity:10,"Deadline Pressure":6,"Context-Switching":13,Conflict:7,Repetition:8},
+      loadout:[
+        {slot:"Primary Focus", name:"Vendor Contract Renewals", power:10},
+        {slot:"Secondary Focus", name:"Logistics Coverage", power:9},
+        {slot:"Core Toolkit", name:"Contract Tracker", power:8},
+        {slot:"Certification", name:"None on file", power:0},
+        {slot:"Support Process", name:"Renewal Reminders", power:6}
+      ],
+      skills:[{name:"Vendor Negotiation",lvl:3},{name:"Process Design",lvl:2},{name:"Contract Review",lvl:2},{name:"Prioritization",lvl:2},{name:"Time Management",lvl:2}],
+      roles:{reportsTo:"COO", directReports:[], tenure:"1.3 yrs", orgLabel:"Biz Ops"},
+      flavor:"Ranger — covers more ground than the headcount suggests",
+      buffer:24, quest:{title:"Vendor contract renewals — logistics", progress:20},
+      struggle:"Renewal backlog growing faster than she can review it",
+      nextCheckin:{date:"Aug 1", type:"1:1"},
+      infractions:[{date:"Jun 12", note:"Missed a vendor renewal deadline — verbal reminder given, no repeat since", severity:"low"}],
+      leave:{balance:4, takenYTD:3, upcoming:{start:"Aug 4", end:"Aug 8"}},
+      coaching:[] },
+
+    { id:"jonah", name:"Jonah Reyes", role:"Creative Director", cls:"Bard", level:10,
+      hp:88, hpMax:100, sp:70, spMax:100,
+      stats:{Execution:79,Craft:84,Communication:90,Resilience:68,Strategy:74,Adaptability:77},
+      resistances:{Ambiguity:16,"Deadline Pressure":11,"Context-Switching":14,Conflict:12,Repetition:6},
+      loadout:[
+        {slot:"Primary Focus", name:"Loot Drop Launch Campaign", power:15},
+        {slot:"Secondary Focus", name:"Brand Refresh", power:10},
+        {slot:"Core Toolkit", name:"Creative Pipeline Suite", power:13},
+        {slot:"Certification", name:"None on file", power:0},
+        {slot:"Support Process", name:"Creator Relations", power:11}
+      ],
+      skills:[{name:"Storytelling",lvl:5},{name:"Art Direction",lvl:4},{name:"Campaign Strategy",lvl:3},{name:"Cross-team Pitching",lvl:4},{name:"Budget Planning",lvl:2}],
+      roles:{reportsTo:"CTO", directReports:["2 designers","1 copywriter"], tenure:"2.8 yrs", orgLabel:"Creative"},
+      flavor:"Bard — turns a feature list into a reason to care",
+      buffer:62, quest:{title:"Loot Drop launch campaign — creator kit", progress:66},
+      struggle:null, nextCheckin:{date:"Aug 5", type:"goal review"},
+      infractions:[],
+      leave:{balance:12, takenYTD:4, upcoming:null},
+      coaching:[] },
+
+    { id:"aisha", name:"Aisha Bello", role:"People & Talent Lead", cls:"Cleric", level:12,
+      hp:80, hpMax:100, sp:62, spMax:100,
+      stats:{Execution:66,Craft:78,Communication:92,Resilience:80,Strategy:61,Adaptability:68},
+      resistances:{Ambiguity:11,"Deadline Pressure":12,"Context-Switching":9,Conflict:17,Repetition:10},
+      loadout:[
+        {slot:"Primary Focus", name:"Onboarding Skill-Tree Refresh", power:12},
+        {slot:"Secondary Focus", name:"Talent Pipeline", power:10},
+        {slot:"Core Toolkit", name:"HRIS Platform", power:14},
+        {slot:"Certification", name:"SHRM-CP", power:13},
+        {slot:"Support Process", name:"Exit Interview Protocol", power:8}
+      ],
+      skills:[{name:"Conflict Mediation",lvl:5},{name:"Coaching",lvl:4},{name:"Talent Sourcing",lvl:3},{name:"Employment Law Basics",lvl:3},{name:"Onboarding Design",lvl:4}],
+      roles:{reportsTo:"Renata Silva", directReports:["1 recruiter","1 HR generalist"], tenure:"3.6 yrs", orgLabel:"HR"},
+      flavor:"Cleric — the team's HP bar stays green because of her",
+      buffer:58, quest:{title:"Refresh onboarding skill-tree templates", progress:51},
+      struggle:null, nextCheckin:{date:"Jul 30", type:"1:1"},
+      infractions:[],
+      leave:{balance:8, takenYTD:8, upcoming:null},
+      coaching:[{skill:"Strategy", goal:"Bring a phased staffing plan, not just a headcount ask, to review", evidence:"Q4 headcount request lacked a phasing plan and got sent back", due:"Feb 2026", status:"completed", outcome:"Q1 headcount plan approved on first pass"}] },
+
+    { id:"tomas", name:"Tomas Varga", role:"Finance Lead", cls:"Alchemist", level:15,
+      hp:67, hpMax:100, sp:51, spMax:100,
+      stats:{Execution:62,Craft:89,Communication:54,Resilience:76,Strategy:80,Adaptability:50},
+      resistances:{Ambiguity:9,"Deadline Pressure":14,"Context-Switching":7,Conflict:6,Repetition:15},
+      loadout:[
+        {slot:"Primary Focus", name:"Q4 Runway Model", power:14},
+        {slot:"Secondary Focus", name:"Payroll Ops", power:16},
+        {slot:"Core Toolkit", name:"Financial Modeling Suite", power:17},
+        {slot:"Certification", name:"CFA Level II", power:15},
+        {slot:"Support Process", name:"Expense Approval Queue", power:9}
+      ],
+      skills:[{name:"Financial Modeling",lvl:5},{name:"Forecasting",lvl:5},{name:"Board Reporting",lvl:3},{name:"Cross-team Budgeting",lvl:2},{name:"Vendor Cost Analysis",lvl:3}],
+      roles:{reportsTo:"Renata Silva", directReports:["1 AP/AR analyst"], tenure:"4.7 yrs", orgLabel:"Finance"},
+      flavor:"Alchemist — transmutes spreadsheets into runway",
+      buffer:47, quest:{title:"Runway model refresh for Q4", progress:30},
+      struggle:null, nextCheckin:{date:"Aug 3", type:"finance snapshot"},
+      infractions:[],
+      leave:{balance:15, takenYTD:1, upcoming:null},
+      coaching:[{skill:"Communication", goal:"Share the Q4 model draft with COO before it's finished, not after", evidence:"Q2 model surprised the leadership review by 2 weeks", due:"Aug 3", status:"active"}] },
+
+    { id:"elin", name:"Elin Kask", role:"Legal Lead", cls:"Loremaster", level:16,
+      hp:39, hpMax:100, sp:22, spMax:100,
+      stats:{Execution:52,Craft:94,Communication:60,Resilience:66,Strategy:77,Adaptability:44},
+      resistances:{Ambiguity:13,"Deadline Pressure":5,"Context-Switching":8,Conflict:11,Repetition:18},
+      loadout:[
+        {slot:"Primary Focus", name:"NDA Backlog Clearance", power:11},
+        {slot:"Secondary Focus", name:"Partnership Agreements", power:13},
+        {slot:"Core Toolkit", name:"Contract Repository", power:16},
+        {slot:"Certification", name:"Bar Admission", power:18},
+        {slot:"Support Process", name:"Paralegal Support", power:0}
+      ],
+      skills:[{name:"Contract Drafting",lvl:5},{name:"Risk Flagging",lvl:5},{name:"IP Strategy",lvl:4},{name:"Negotiation",lvl:3},{name:"Regulatory Research",lvl:4}],
+      roles:{reportsTo:"Renata Silva", directReports:[], tenure:"5.2 yrs", orgLabel:"Legal"},
+      flavor:"Loremaster — keeper of every clause anyone's ever signed",
+      buffer:14, quest:{title:"NDA backlog clearance", progress:22},
+      struggle:"NDA queue at 31 open, no paralegal support since April",
+      nextCheckin:{date:"Jul 30", type:"blocker review"},
+      infractions:[],
+      leave:{balance:3, takenYTD:2, upcoming:null},
+      coaching:[] }
+  ];
+
+  var peopleById = {};
+  people.forEach(function (p) { peopleById[p.id] = p; p.morale = Math.round(p.stats.Resilience / 10); });
+
+  function severity(p) {
+    if (p.struggle && p.hp < 50) return 3;
+    if (p.struggle || p.hp < 65) return 2;
+    return 1;
+  }
+  var ranked = people.slice().sort(function (a, b) { return severity(b) - severity(a) || a.hp - b.hp; });
+  var activeParty = ranked.slice(0, 5);
+  var reserve = ranked.slice(5);
+
+  var selectedId = activeParty[0].id;
+  var activeTab = "attributes";
+
+  function icon(id) { return '<svg><use href="#' + id + '"></use></svg>'; }
+  function hpClass(pct) { return pct < 50 ? "crit" : pct < 65 ? "warn" : ""; }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  function parseCheckinDate(str) { return new Date("2026 " + str); }
+  function lowestStat(p) { var low = null; STATS.forEach(function (k) { if (!low || p.stats[k] < p.stats[low]) low = k; }); return low; }
+  function highestStat(p) { var high = null; STATS.forEach(function (k) { if (!high || p.stats[k] > p.stats[high]) high = k; }); return high; }
+  function avgStat(p) { return STATS.reduce(function (s, k) { return s + p.stats[k]; }, 0) / STATS.length; }
+
+  /* ---------- Party rail ---------- */
+  function renderRail() {
+    document.getElementById("activeCount").textContent = activeParty.length + " / 5";
+    document.getElementById("reserveCount").textContent = reserve.length + " on bench";
+
+    document.getElementById("slotList").innerHTML = activeParty.map(function (p, i) {
+      var hpPct = Math.round(p.hp / p.hpMax * 100), spPct = Math.round(p.sp / p.spMax * 100);
+      return '<button class="slot-card' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
+        '<span class="slot-num">' + (i + 1) + '</span>' +
+        '<span class="portrait">' + initials(p.name) + '</span>' +
+        '<span class="slot-meta">' +
+          '<span class="slot-name-row"><span class="slot-name">' + p.name + '</span><span class="slot-lv">Lv ' + p.level + '</span></span>' +
+          '<span class="mini-bars">' +
+            '<span class="mini-track"><span class="mini-fill hp ' + hpClass(hpPct) + '" style="width:' + hpPct + '%"></span></span>' +
+            '<span class="mini-track"><span class="mini-fill sp" style="width:' + spPct + '%"></span></span>' +
+          '</span>' +
+        '</span>' +
+        '</button>';
+    }).join("");
+
+    document.getElementById("reserveTiles").innerHTML = reserve.map(function (p) {
+      return '<button class="roster-tile' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
+        '<span class="portrait">' + initials(p.name) + '</span>' +
+        '<span class="rname">' + p.name.split(" ")[0] + '</span>' +
+        '<span class="rrole">' + p.role + '</span>' +
+        '</button>';
+    }).join("");
+  }
+
+  function initials(name) { return name.split(" ").map(function (w) { return w[0]; }).join(""); }
+
+  /* ---------- People KPIs + Spotlight ---------- */
+  function renderPeopleKPIs() {
+    var activeCoaching = people.reduce(function (n, p) { return n + p.coaching.filter(function (c) { return c.status !== "completed"; }).length; }, 0);
+    var openInfractions = people.reduce(function (n, p) { return n + p.infractions.length; }, 0);
+    var needsAttention = people.filter(function (p) { return severity(p) > 1; }).length;
+    var kpis = [
+      { label: "Headcount", value: String(people.length), delta: "stable", tone: "flat" },
+      { label: "Needs Attention", value: String(needsAttention), delta: needsAttention > 3 ? "elevated" : "normal", tone: needsAttention > 3 ? "warning" : "good" },
+      { label: "Coaching Quests Active", value: String(activeCoaching), delta: "tracked", tone: "good" },
+      { label: "Open Infractions", value: String(openInfractions), delta: openInfractions > 0 ? "review" : "clean", tone: openInfractions > 0 ? "warning" : "good" }
+    ];
+    document.getElementById("peopleKpiRow").innerHTML = kpis.map(function (k) {
+      return '<div class="kpi"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+    }).join("");
+  }
+
+  function renderSpotlight() {
+    var pool = reserve.length ? reserve : people;
+    var best = pool.slice().sort(function (a, b) { return avgStat(b) - avgStat(a); })[0];
+    var bestKey = highestStat(best);
+    document.getElementById("recognizePanel").innerHTML =
+      '<div class="panel-head"><h3>Recognize</h3><div class="hint">Steady + highest composite score</div></div>' +
+      '<div class="detail-header" style="align-items:center;">' +
+        '<span class="portrait" style="width:44px;height:44px;font-size:14px;">' + initials(best.name) + '</span>' +
+        '<span class="detail-id"><span class="detail-name" style="font-size:15px;">' + best.name + '</span><span class="detail-role">' + best.role + '</span></span>' +
+      '</div>' +
+      '<p style="font-size:12.5px;color:var(--text-secondary);margin:10px 0 0;">Leading the roster on ' + bestKey + ' (' + best.stats[bestKey] + ') while holding steady status — worth calling out this cycle.</p>';
+
+    var counts = {};
+    people.forEach(function (p) { var l = lowestStat(p); counts[l] = (counts[l] || 0) + 1; });
+    var topGap = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; })[0];
+    document.getElementById("coachPriorityPanel").innerHTML =
+      '<div class="panel-head"><h3>Team Coaching Priority</h3><div class="hint">Org-wide growth edge</div></div>' +
+      '<p style="font-size:12.5px;color:var(--text-secondary);">' + counts[topGap] + ' of ' + people.length + ' team members show <strong style="color:var(--accent-strong);">' + topGap + '</strong> as their lowest attribute — the highest-leverage skill to build coaching templates around this quarter.</p>';
+  }
+
+  /* ---------- Radar chart ---------- */
+  function buildRadar(stats) {
+    var keys = STATS, n = keys.length, cx = 100, cy = 100, R = 74;
+    var rings = [0.33, 0.66, 1].map(function (f) {
+      var pts = keys.map(function (_, i) {
+        var a = (-90 + i * 360 / n) * Math.PI / 180;
+        return (cx + Math.cos(a) * R * f) + "," + (cy + Math.sin(a) * R * f);
+      }).join(" ");
+      return '<polygon points="' + pts + '" fill="none" stroke="var(--border)" stroke-width="1" />';
+    }).join("");
+    var axes = keys.map(function (_, i) {
+      var a = (-90 + i * 360 / n) * Math.PI / 180;
+      var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+      return '<line x1="' + cx + '" y1="' + cy + '" x2="' + x + '" y2="' + y + '" stroke="var(--border)" stroke-width="1" />';
+    }).join("");
+    var dataPts = keys.map(function (k, i) {
+      var a = (-90 + i * 360 / n) * Math.PI / 180;
+      var v = stats[k] / 100;
+      return (cx + Math.cos(a) * R * v) + "," + (cy + Math.sin(a) * R * v);
+    });
+    var dots = keys.map(function (k, i) {
+      var a = (-90 + i * 360 / n) * Math.PI / 180;
+      var v = stats[k] / 100;
+      var x = cx + Math.cos(a) * R * v, y = cy + Math.sin(a) * R * v;
+      return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="var(--accent-strong)" />';
+    }).join("");
+
+    return '<svg viewBox="0 0 200 200" width="200" height="200">' + rings + axes +
+      '<polygon points="' + dataPts.join(" ") + '" fill="var(--accent)" fill-opacity="0.28" stroke="var(--accent)" stroke-width="2" />' +
+      dots + '</svg>';
+  }
+
+  /* ---------- Detail panel ---------- */
+  var TAB_LABELS = { attributes: "Attributes", loadout: "Loadout", skills: "Skills & Coaching", roles: "Dossier" };
+  var TAB_ORDER = ["attributes", "loadout", "skills", "roles"];
+
+  function cycleTab(dir) {
+    var idx = TAB_ORDER.indexOf(activeTab);
+    idx = (idx + dir + TAB_ORDER.length) % TAB_ORDER.length;
+    activeTab = TAB_ORDER[idx];
+    renderDetail();
+  }
+
+  function renderDetail() {
+    var p = peopleById[selectedId];
+    var hpPct = Math.round(p.hp / p.hpMax * 100), spPct = Math.round(p.sp / p.spMax * 100);
+
+    var header =
+      '<div class="detail-header">' +
+        '<span class="detail-portrait">' + initials(p.name) + '</span>' +
+        '<span class="detail-id">' +
+          '<span class="detail-name">' + p.name + '</span>' +
+          '<span class="detail-role">' + p.role + ' · ' + p.cls + '</span>' +
+          '<span class="detail-flavor">' + p.flavor + '</span>' +
+        '</span>' +
+        '<span class="detail-lv">LV ' + p.level + '</span>' +
+      '</div>' +
+      '<div class="status-bar-row">' +
+        '<div class="status-bar"><div class="status-bar-label"><span>Capacity (HP)</span><span>' + p.hp + '/' + p.hpMax + '</span></div>' +
+          '<div class="bar-track"><div class="bar-fill mini-fill hp ' + hpClass(hpPct) + '" style="width:' + hpPct + '%"></div></div></div>' +
+        '<div class="status-bar"><div class="status-bar-label"><span>Focus (SP)</span><span>' + p.sp + '/' + p.spMax + '</span></div>' +
+          '<div class="bar-track"><div class="bar-fill mini-fill sp" style="width:' + spPct + '%"></div></div></div>' +
+      '</div>';
+
+    var tabNav = '<div class="tab-nav">' +
+      '<button class="shoulder-btn" id="tabPrev">◀ L</button>' +
+      '<div class="tab-bar" role="tablist" aria-label="Character sheet sections">' + TAB_ORDER.map(function (t) {
+        return '<button class="tab-btn' + (t === activeTab ? " active" : "") + '" data-tab="' + t + '" role="tab" aria-selected="' + (t === activeTab) + '">' + TAB_LABELS[t] + '</button>';
+      }).join("") + '</div>' +
+      '<button class="shoulder-btn" id="tabNext">R ▶</button>' +
+      '</div>';
+
+    var body = "";
+    if (activeTab === "attributes") {
+      var lowK = lowestStat(p);
+      var attrRows = STATS.map(function (k) {
+        return '<div class="attr-row"><span class="aname"' + (k === lowK ? ' style="color:var(--warning);font-weight:700;"' : '') + '>' + k + (k === lowK ? " — growth edge" : "") + '</span><span class="aval">' + p.stats[k] + '</span></div>';
+      }).join("");
+      var resRows = Object.keys(p.resistances).map(function (k) { return '<div class="attr-row"><span class="aname">' + k + '</span><span class="aval">' + p.resistances[k] + '</span></div>'; }).join("");
+      var legend = STATS.map(function (k) { return '<div class="radar-legend-item"><span>' + k + '</span><b>' + p.stats[k] + '</b></div>'; }).join("");
+      body = '<div class="tab-content">' +
+        '<div><div class="subpanel-title">Attributes</div><div class="attr-list">' + attrRows + '</div>' +
+          '<div class="subpanel-title" style="margin-top:14px;">Resistances</div><div class="attr-list">' + resRows + '</div></div>' +
+        '<div class="radar-wrap"><div class="subpanel-title" style="align-self:flex-start;">Stat Web</div>' + buildRadar(p.stats) +
+          '<div class="radar-legend">' + legend + '</div></div>' +
+      '</div>';
+    } else if (activeTab === "loadout") {
+      var iconMap = { "Primary Focus": "ic-sword", "Secondary Focus": "ic-sword", "Core Toolkit": "ic-gear", "Certification": "ic-medal", "Support Process": "ic-shieldeq" };
+      var rows = p.loadout.map(function (l) {
+        return '<div class="loadout-row"><span class="loadout-icon">' + icon(iconMap[l.slot] || "ic-gear") + '</span>' +
+          '<span class="loadout-text"><span class="loadout-slot">' + l.slot + '</span>' +
+          '<span class="loadout-name' + (l.power === 0 ? " empty" : "") + '">' + l.name + '</span></span>' +
+          '<span class="loadout-power">' + (l.power === 0 ? "—" : l.power) + '</span></div>';
+      }).join("");
+      body = '<div class="tab-content single"><div><div class="subpanel-title">Equipped Loadout</div>' +
+        '<div class="loadout-list">' + rows + '</div>' +
+        '<div class="buffer-line"><span>Deadline Buffer</span><b>' + p.buffer + '%</b></div></div></div>';
+    } else if (activeTab === "skills") {
+      var skillTiles = p.skills.map(function (s) {
+        var pips = "";
+        for (var i = 0; i < 5; i++) pips += '<span class="pip' + (i < s.lvl ? " filled" : "") + '"></span>';
+        return '<div class="skill-tile"><span class="skill-name">' + s.name + '</span><span class="pip-row">' + pips + '</span></div>';
+      }).join("");
+      var activeCoaching = p.coaching.filter(function (c) { return c.status !== "completed"; });
+      var pastCoaching = p.coaching.filter(function (c) { return c.status === "completed"; });
+      var coachRows = activeCoaching.length ? activeCoaching.map(function (c) {
+        return '<div class="coach-item"><div class="head"><span>' + esc(c.skill) + '</span><span class="due">Due ' + esc(c.due) + '</span></div>' +
+          '<div class="evidence"><strong>Target:</strong> ' + esc(c.goal) + '</div><div class="evidence"><strong>Evidence:</strong> ' + esc(c.evidence) + '</div></div>';
+      }).join("") : '<div class="coach-empty">No active coaching quests.</div>';
+      var historyRows = pastCoaching.length ? pastCoaching.map(function (c) {
+        return '<div class="coach-item" style="opacity:0.75;"><div class="head"><span>✓ ' + esc(c.skill) + '</span><span class="due">Closed ' + esc(c.due) + '</span></div>' +
+          '<div class="evidence"><strong>Target:</strong> ' + esc(c.goal) + '</div><div class="evidence"><strong>Outcome:</strong> ' + esc(c.outcome) + '</div></div>';
+      }).join("") : '<div class="coach-empty">No closed coaching quests yet.</div>';
+      var statOptions = STATS.map(function (k) { return '<option value="' + k + '"' + (k === lowestStat(p) ? " selected" : "") + '>' + k + ' — ' + p.stats[k] + '</option>'; }).join("");
+      body = '<div class="tab-content"><div><div class="subpanel-title">Skill Tree</div><div class="skills-grid">' + skillTiles + '</div></div>' +
+        '<div><div class="subpanel-title">Active Coaching</div><div class="coach-list">' + coachRows + '</div>' +
+        '<div class="subpanel-title" style="margin-top:12px;">Coaching History</div><div class="coach-list">' + historyRows + '</div>' +
+        '<form class="coach-form" id="coachForm">' +
+          '<div class="field"><label for="skillSel">Skill focus</label><select id="skillSel">' + statOptions + '</select></div>' +
+          '<div class="field"><label for="goalInput">Coaching target</label><input id="goalInput" type="text" placeholder="e.g. Flag blockers within 48 hours" required /></div>' +
+          '<div class="field"><label for="evInput">Evidence</label><textarea id="evInput" placeholder="What you observed that prompted this" required></textarea></div>' +
+          '<div class="field"><label for="dueInput">Check back by</label><input id="dueInput" type="text" placeholder="e.g. Aug 12" required /></div>' +
+          '<button type="submit" class="submit-btn">Assign Coaching Quest</button>' +
+        '</form></div></div>';
+    } else if (activeTab === "roles") {
+      var reports = p.roles.directReports.length ? p.roles.directReports.map(function (d) { return '<span class="plain-chip">' + d + '</span>'; }).join("") : '<span class="plain-chip">No direct reports</span>';
+      var leaveRow = p.leave.upcoming
+        ? '<div class="kv-row"><span class="k">Upcoming leave</span><span class="v">' + p.leave.upcoming.start + '–' + p.leave.upcoming.end + '</span></div>'
+        : '<div class="kv-row"><span class="k">Upcoming leave</span><span class="v">None scheduled</span></div>';
+      var infractionRows = p.infractions.length
+        ? p.infractions.map(function (inf) {
+            return '<div class="list-row"><span class="stripe ' + (inf.severity === "low" ? "warning" : "critical") + '"></span>' +
+              '<span class="body"><span class="title">' + inf.date + '</span><span class="sub">' + inf.note + '</span></span></div>';
+          }).join("")
+        : '<div class="coach-empty">No infractions on record.</div>';
+      body = '<div class="tab-content"><div>' +
+        '<div class="subpanel-title">Role Sheet</div>' +
+        '<div class="roles-kv">' +
+        '<div class="kv-row"><span class="k">Reports to</span><span class="v">' + p.roles.reportsTo + '</span></div>' +
+        '<div class="kv-row"><span class="k">Tenure</span><span class="v">' + p.roles.tenure + '</span></div>' +
+        '<div class="kv-row"><span class="k">Morale (LP)</span><span class="v">' + p.morale + ' / 10</span></div>' +
+        '<div class="kv-row"><span class="k">Next check-in</span><span class="v">' + p.nextCheckin.date + ' · ' + p.nextCheckin.type + '</span></div>' +
+        '</div>' +
+        '<div class="subpanel-title" style="margin-top:12px;">Direct Reports</div><div class="chip-list">' + reports + '</div>' +
+        '<div class="subpanel-title" style="margin-top:12px;">Active Quest</div>' +
+        '<div class="loadout-row" style="border-bottom:none;"><span class="loadout-icon">' + icon("ic-target") + '</span>' +
+        '<span class="loadout-text"><span class="loadout-name">' + p.quest.title + '</span></span></div>' +
+        '<div class="bar-track"><div class="bar-fill mini-fill sp" style="width:' + p.quest.progress + '%"></div></div>' +
+        (p.struggle ? '<div class="detail-flavor" style="color:var(--warning);margin-top:8px;">⚠ ' + p.struggle + '</div>' : '') +
+        '</div>' +
+        '<div>' +
+        '<div class="subpanel-title">Leave</div>' +
+        '<div class="roles-kv">' +
+        '<div class="kv-row"><span class="k">Balance</span><span class="v">' + p.leave.balance + ' days</span></div>' +
+        '<div class="kv-row"><span class="k">Taken YTD</span><span class="v">' + p.leave.takenYTD + ' days</span></div>' +
+        leaveRow +
+        '</div>' +
+        '<div class="subpanel-title" style="margin-top:12px;">Infractions</div>' +
+        '<div class="list-rows">' + infractionRows + '</div>' +
+        '</div></div>';
+    }
+
+    document.getElementById("detailPanel").innerHTML = header + tabNav + body;
+
+    document.getElementById("tabPrev").addEventListener("click", function () { cycleTab(-1); });
+    document.getElementById("tabNext").addEventListener("click", function () { cycleTab(1); });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"), function (btn) {
+      btn.addEventListener("click", function () { activeTab = btn.getAttribute("data-tab"); renderDetail(); });
+    });
+    var form = document.getElementById("coachForm");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var skill = document.getElementById("skillSel").value;
+        var goal = document.getElementById("goalInput").value.trim();
+        var ev = document.getElementById("evInput").value.trim();
+        var due = document.getElementById("dueInput").value.trim();
+        if (!goal || !ev || !due) return;
+        p.coaching.unshift({ skill: skill, goal: goal, evidence: ev, due: due, status: "active" });
+        renderDetail();
+        renderPeopleKPIs();
+      });
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+    var sel = e.target.closest("[data-select]");
+    if (sel) { selectedId = sel.getAttribute("data-select"); activeTab = "attributes"; renderRail(); renderDetail(); }
+  });
+
+  /* ---------- Mode switch ---------- */
+  document.getElementById("tabPartyBtn").addEventListener("click", function () { setMode("party"); });
+  document.getElementById("tabOpsBtn").addEventListener("click", function () { setMode("ops"); });
+  function setMode(mode) {
+    var isParty = mode === "party";
+    document.getElementById("partyView").hidden = !isParty;
+    document.getElementById("opsView").hidden = isParty;
+    document.getElementById("tabPartyBtn").classList.toggle("active", isParty);
+    document.getElementById("tabPartyBtn").setAttribute("aria-selected", String(isParty));
+    document.getElementById("tabOpsBtn").classList.toggle("active", !isParty);
+    document.getElementById("tabOpsBtn").setAttribute("aria-selected", String(!isParty));
+    document.body.classList.toggle("ops-active", !isParty);
+  }
+
+  /* ================= OPS DATA + RENDER ================= */
+  var plMonths = [
+    { m: "Feb", rev: 195, exp: 210 },
+    { m: "Mar", rev: 205, exp: 215 },
+    { m: "Apr", rev: 215, exp: 218 },
+    { m: "May", rev: 230, exp: 224 },
+    { m: "Jun", rev: 248, exp: 230 },
+    { m: "Jul", rev: 260, exp: 232 }
+  ];
+  var subscriptions = [
+    { tool: "AWS", category: "Infrastructure", monthly: 8.4, renews: "Monthly" },
+    { tool: "Datadog", category: "Observability", monthly: 2.1, renews: "Monthly" },
+    { tool: "Segment", category: "Analytics", monthly: 1.65, renews: "Monthly" },
+    { tool: "Twilio", category: "Notifications", monthly: 1.24, renews: "Monthly" },
+    { tool: "Zendesk", category: "Support", monthly: 0.89, renews: "Sep 2026" },
+    { tool: "GitHub + CI", category: "Dev tooling", monthly: 0.76, renews: "Nov 2026" },
+    { tool: "Google Workspace", category: "Productivity", monthly: 0.56, renews: "Monthly" },
+    { tool: "Cloudflare", category: "Infrastructure", monthly: 0.48, renews: "Monthly" },
+    { tool: "Slack", category: "Productivity", monthly: 0.41, renews: "Feb 2027" },
+    { tool: "Figma", category: "Design", monthly: 0.34, renews: "Nov 2026" },
+    { tool: "LaunchDarkly", category: "Dev tooling", monthly: 0.31, renews: "Monthly" },
+    { tool: "PagerDuty", category: "Observability", monthly: 0.22, renews: "Monthly" },
+    { tool: "Notion", category: "Productivity", monthly: 0.18, renews: "Monthly" }
+  ];
+  var toolsInfraTotal = Math.round(subscriptions.reduce(function (s, x) { return s + x.monthly; }, 0));
+  var expenseCats = [
+    { name: "Payroll", value: 232 - (34 + toolsInfraTotal + 15 + 13) },
+    { name: "Marketing", value: 34 },
+    { name: "Tools & Infra", value: toolsInfraTotal },
+    { name: "Legal & Compliance", value: 15 },
+    { name: "Ops & Logistics", value: 13 }
+  ];
+
+  var activityFeed = [
+    { type: "meeting", date: "Jul 30", title: "1:1 — Mara Okoye", sub: "Capacity check-in, socket migration status" },
+    { type: "meeting", date: "Jul 30", title: "1:1 — Aisha Bello", sub: "Onboarding template refresh sync" },
+    { type: "meeting", date: "Jul 31", title: "Blocker review — Devon Cross", sub: "Socket-service repo access escalation" },
+    { type: "work", date: "Jul 28", title: "NDA backlog: 3 cleared", sub: "Elin Kask — queue down to 31" },
+    { type: "work", date: "Jul 26", title: "Creator kit assets delivered", sub: "Jonah Reyes — Loot Drop launch campaign" },
+    { type: "meeting", date: "Aug 1", title: "1:1 — Sana Rocha", sub: "Vendor renewal backlog" },
+    { type: "work", date: "Jul 24", title: "Q3 HR audit pass complete", sub: "Renata Silva — compliance sweep, 1 of 3 legs done" },
+    { type: "meeting", date: "Aug 3", title: "Finance snapshot — Tomas Varga", sub: "Q4 runway model review" },
+    { type: "work", date: "Jul 23", title: "Loot Drop socket migration — staging deploy", sub: "Mara Okoye — pending Devon's audit sign-off" },
+    { type: "meeting", date: "Aug 4", title: "Goal review — Priya Anand", sub: "Loot Drop v2 reward-type spec" }
+  ];
+  var complianceItems = [
+    { title: "Winner-selection logic discrepancy (Loot Drop)", sub: "Owner: Devon Cross · claim-order vs. secure random draw", sev: "critical", tag: "Open" },
+    { title: "NDA backlog", sub: "Owner: Elin Kask · 31 open, no paralegal support", sev: "critical", tag: "Open" },
+    { title: "Q3 compliance sweep — HR / Finance / Legal", sub: "Owner: Renata Silva · in progress", sev: "warning", tag: "44%" },
+    { title: "SOC 2 Type II renewal", sub: "Owner: Renata Silva · evidence window opens Aug 10", sev: "good", tag: "On track" }
+  ];
+  var approvals = [
+    { title: "PTO request — Sana Rocha", sub: "Aug 4–8", sev: "warning", tag: "Pending" },
+    { title: "Expense report — Jonah Reyes", sub: "$2,340 · campaign spend", sev: "warning", tag: "Pending" },
+    { title: "NDA countersignature — Elin Kask", sub: "Partnership agreement", sev: "critical", tag: "Pending" },
+    { title: "Payroll adjustment — Tomas Varga", sub: "Q3 bonus accrual correction", sev: "warning", tag: "Pending" }
+  ];
+  var docs = [
+    { title: "Vendor MSA — CloudHost Inc.", sub: "Renews Aug 15", sev: "warning", tag: "16d" },
+    { title: "SOC 2 Type II certification", sub: "Expires Sep 1", sev: "warning", tag: "33d" },
+    { title: "Streamer Partnership Agreement — Creator Guild", sub: "Renews Aug 20", sev: "good", tag: "21d" },
+    { title: "D&O Insurance Policy", sub: "Renews Oct 3", sev: "good", tag: "65d" }
+  ];
+
+  function renderOpsKPIs() {
+    var last = plMonths[plMonths.length - 1], prev = plMonths[plMonths.length - 2];
+    var netLast = last.rev - last.exp, netPrev = prev.rev - prev.exp;
+    var kpis = [
+      { label: "MRR", value: "$" + last.rev + "K", delta: "+" + Math.round((last.rev-prev.rev)/prev.rev*100) + "% MoM", tone: "good" },
+      { label: "Net (Rev − Exp)", value: (netLast >= 0 ? "+$" : "−$") + Math.abs(netLast) + "K", delta: netLast > netPrev ? "widening" : "narrowing", tone: netLast >= 0 ? "good" : "warning" },
+      { label: "Cash Runway", value: "14 mo", delta: "flat", tone: "flat" },
+      { label: "Open Compliance Flags", value: String(complianceItems.filter(function(c){return c.sev!=="good";}).length), delta: "review", tone: "warning" }
+    ];
+    document.getElementById("opsKpiRow").innerHTML = kpis.map(function (k) {
+      return '<div class="kpi"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+    }).join("");
+  }
+
+  function renderPLChart() {
+    var w = 560, h = 200, padL = 30, padB = 24, padT = 10;
+    var max = Math.max.apply(null, plMonths.map(function (d) { return Math.max(d.rev, d.exp); }));
+    var scale = (h - padT - padB) / (max * 1.1);
+    var groupW = (w - padL) / plMonths.length;
+    var barW = 16;
+    var bars = plMonths.map(function (d, i) {
+      var gx = padL + i * groupW + groupW / 2;
+      var revH = d.rev * scale, expH = d.exp * scale;
+      var x1 = gx - barW - 2, x2 = gx + 2;
+      var y1 = h - padB - revH, y2 = h - padB - expH;
+      return '<g>' +
+        '<rect x="' + x1 + '" y="' + y1 + '" width="' + barW + '" height="' + revH + '" rx="3" fill="var(--accent)"><title>' + d.m + ' Revenue: $' + d.rev + 'K</title></rect>' +
+        '<rect x="' + x2 + '" y="' + y2 + '" width="' + barW + '" height="' + expH + '" rx="3" fill="#5c7ea3"><title>' + d.m + ' Expenses: $' + d.exp + 'K</title></rect>' +
+        '<text x="' + gx + '" y="' + (h - 6) + '" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="var(--font-data)">' + d.m + '</text>' +
+        '</g>';
+    }).join("");
+    var baseline = '<line x1="' + padL + '" y1="' + (h - padB) + '" x2="' + w + '" y2="' + (h - padB) + '" stroke="var(--border)" stroke-width="1"/>';
+    document.getElementById("plChart").innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" style="min-width:480px;">' + baseline + bars + '</svg>';
+  }
+
+  function renderExpenseBars() {
+    var total = expenseCats.reduce(function (s, c) { return s + c.value; }, 0);
+    document.getElementById("expenseTotalHint").textContent = "$" + total + "K total";
+    var max = Math.max.apply(null, expenseCats.map(function (c) { return c.value; }));
+    var sortedCats = expenseCats.slice().sort(function (a, b) { return b.value - a.value; });
+    document.getElementById("expenseBars").innerHTML = sortedCats.map(function (c, i) {
+      var pct = Math.round(c.value / max * 100);
+      var lightness = 78 - i * 10;
+      return '<div class="seq-row"><div class="seq-label-row"><span class="n">' + c.name + '</span><span class="v">$' + c.value + 'K</span></div>' +
+        '<div class="seq-track"><div class="seq-fill" style="width:' + pct + '%;background:hsl(42,60%,' + lightness + '%)"></div></div></div>';
+    }).join("");
+  }
+
+  function renderSubscriptions() {
+    var total = subscriptions.reduce(function (s, x) { return s + x.monthly; }, 0);
+    document.getElementById("subsTotalHint").textContent = "$" + total.toFixed(1) + "K/mo · " + subscriptions.length + " tools";
+    var sorted = subscriptions.slice().sort(function (a, b) { return b.monthly - a.monthly; });
+    document.getElementById("subsList").innerHTML = sorted.map(function (s) {
+      return '<div class="list-row"><span class="stripe good"></span><span class="body"><span class="title">' + s.tool + '</span><span class="sub">' + s.category + ' · renews ' + s.renews + '</span></span>' +
+        '<span class="tag good">$' + s.monthly.toFixed(2) + 'K</span></div>';
+    }).join("");
+  }
+
+  function renderActivityFeed() {
+    var typeMeta = { meeting: { sev: "warning", tag: "Meeting" }, work: { sev: "good", tag: "Work" } };
+    var sorted = activityFeed.slice().sort(function (a, b) { return parseCheckinDate(a.date) - parseCheckinDate(b.date); });
+    document.getElementById("activityFeed").innerHTML = sorted.map(function (a) {
+      var m = typeMeta[a.type];
+      return '<div class="list-row"><span class="stripe ' + m.sev + '"></span><span class="body"><span class="title">' + a.title + '</span><span class="sub">' + a.date + ' · ' + a.sub + '</span></span><span class="tag ' + m.sev + '">' + m.tag + '</span></div>';
+    }).join("");
+  }
+
+  function renderListPanel(elId, items) {
+    document.getElementById(elId).innerHTML = items.map(function (it) {
+      return '<div class="list-row"><span class="stripe ' + it.sev + '"></span><span class="body"><span class="title">' + it.title + '</span><span class="sub">' + it.sub + '</span></span><span class="tag ' + it.sev + '">' + it.tag + '</span></div>';
+    }).join("");
+  }
+
+  function renderGoals() {
+    var goals = people.map(function (p) { return { title: p.quest.title, owner: p.name, progress: p.quest.progress }; })
+      .sort(function (a, b) { return a.progress - b.progress; }).slice(0, 5);
+    document.getElementById("goalList").innerHTML = goals.map(function (g) {
+      return '<div class="goal-row"><div class="goal-top"><span>' + g.title + '</span><span class="owner">' + g.progress + '%</span></div>' +
+        '<div class="owner">' + g.owner + '</div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + g.progress + '%;height:100%;border-radius:4px;background:var(--accent);"></div></div></div>';
+    }).join("");
+  }
+
+  function renderReportTiles() {
+    var attendance = "96%", turnover = "4.2%", skillGaps = people.reduce(function (n, p) { return n + Object.values(p.stats).filter(function (v) { return v < 60; }).length; }, 0);
+    var payrollCat = expenseCats.filter(function (c) { return c.name === "Payroll"; })[0];
+    var payroll = "$" + payrollCat.value + "K";
+    var tiles = [
+      { label: "Attendance (30d)", value: attendance },
+      { label: "Turnover (TTM)", value: turnover },
+      { label: "Skill Gaps Flagged", value: String(skillGaps) },
+      { label: "Payroll (Jul)", value: payroll }
+    ];
+    document.getElementById("reportTiles").innerHTML = tiles.map(function (t) {
+      return '<div class="report-tile"><span class="rt-label">' + t.label + '</span><span class="rt-value">' + t.value + '</span></div>';
+    }).join("");
+  }
+
+  function renderOrgMini() {
+    // Derived live from each person's roles.reportsTo/orgLabel so this chart can never drift from the roster data.
+    var branches = ["CTO", "COO"];
+    var cols = branches.map(function (branch) {
+      var directs = people.filter(function (p) { return p.roles.reportsTo === branch; });
+      var leaves = directs.map(function (p) {
+        return '<span class="org-leaf">' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.roles.orgLabel) + '</span>';
+      }).join("");
+      var subLeaves = directs.map(function (lead) {
+        return people.filter(function (p) { return p.roles.reportsTo === lead.name; }).map(function (p) {
+          return '<span class="org-leaf sub">↳ ' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.roles.orgLabel) + '</span>';
+        }).join("");
+      }).join("");
+      return '<div class="org-col"><div class="org-node">' + branch + '</div><div class="org-leaf-group">' + leaves + subLeaves + '</div></div>';
+    }).join("");
+    document.getElementById("orgMini").innerHTML = '<div class="org-node">CEO</div><div class="org-branches">' + cols + '</div>';
+  }
+
+  renderOpsKPIs();
+  renderPLChart();
+  renderExpenseBars();
+  renderSubscriptions();
+  renderActivityFeed();
+  document.getElementById("complianceCountHint").textContent = complianceItems.length + " tracked";
+  renderListPanel("complianceList", complianceItems);
+  renderListPanel("approvalList", approvals);
+  renderGoals();
+  renderListPanel("docList", docs);
+  renderReportTiles();
+  renderOrgMini();
+
+  renderPeopleKPIs();
+  renderSpotlight();
+  renderRail();
+  renderDetail();
+})();
+</script>
+</body>
+</html>
