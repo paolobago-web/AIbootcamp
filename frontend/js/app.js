@@ -1,351 +1,348 @@
 (function () {
   "use strict";
 
-  var STATS = ["Execution", "Craft", "Communication", "Resilience", "Strategy", "Adaptability"];
+  var ATTRS = ["Execution", "Craft", "Communication", "Strategy", "Adaptability", "Resilience"];
 
+  var NAV = [
+    { id: "overview", label: "Overview", icon: "ic-overview" },
+    { id: "people", label: "People", icon: "ic-people" },
+    { id: "work", label: "Work", icon: "ic-work" },
+    { id: "coaching", label: "Coaching", icon: "ic-coaching" },
+    { id: "finance", label: "Finance", icon: "ic-finance" },
+    { id: "reports", label: "Reports", icon: "ic-reports" },
+    { id: "codex", label: "Codex", icon: "ic-codex" },
+    { id: "settings", label: "Settings", icon: "ic-settings" }
+  ];
+
+  /* ================= PEOPLE DATA ================= */
   var people = [
-    { id:"mara", name:"Mara Okoye", role:"Senior Tech Lead", cls:"Architect-Mage", level:14,
-      hp:62, hpMax:100, sp:40, spMax:100,
-      stats:{Execution:85,Craft:88,Communication:62,Resilience:58,Strategy:66,Adaptability:71},
-      resistances:{Ambiguity:12,"Deadline Pressure":9,"Context-Switching":6,Conflict:10,Repetition:14},
-      loadout:[
-        {slot:"Primary Focus", name:"Loot Drop Socket Migration", power:18},
-        {slot:"Secondary Focus", name:"Platform Reliability", power:14},
-        {slot:"Core Toolkit", name:"Systems Architecture", power:17},
-        {slot:"Certification", name:"AWS Solutions Architect", power:12},
-        {slot:"Support Process", name:"On-call Rotation", power:10}
-      ],
-      skills:[{name:"System Design",lvl:5},{name:"Mentorship",lvl:2},{name:"Incident Response",lvl:4},{name:"Cross-team Comms",lvl:2},{name:"Roadmapping",lvl:3}],
-      roles:{reportsTo:"CTO", directReports:["2 backend engineers","1 SRE"], tenure:"3.4 yrs", orgLabel:"Tech"},
-      flavor:"Architect-Mage — turns tangled systems into clean spellwork",
-      buffer:38, quest:{title:"Loot Drop socket-service migration", progress:58},
-      struggle:"Carrying two workstreams since the QA req went unfilled",
+    { id:"mara", name:"Mara Okoye", title:"Senior Tech Lead", department:"Engineering",
+      capacity:62, capacityMax:100, focus:40, focusMax:100,
+      attributes:{Execution:85,Craft:88,Communication:62,Strategy:66,Adaptability:71,Resilience:58},
+      skills:{
+        "Technical Execution":[{name:"System Design",rating:5},{name:"Incident Response",rating:4},{name:"Roadmapping",rating:3}],
+        "Leadership":[{name:"Mentorship",rating:2},{name:"Cross-team Communication",rating:2}]
+      },
+      project:{ name:"Loot Drop Socket-Service Migration", priority:"High", progress:58,
+        objective:"Move real-time reward delivery onto the new socket service without downtime.",
+        timeline:"Aug 2026", dependency:"QA engineering role still unfilled" },
+      blocker:"Carrying two workstreams since the QA req went unfilled",
       nextCheckin:{date:"Jul 30", type:"1:1"},
-      infractions:[],
-      leave:{balance:9, takenYTD:6, upcoming:null},
-      coaching:[{skill:"Communication", goal:"Present the Q1 architecture review without over-explaining edge cases", evidence:"Q1 review ran 40 minutes over its slot", due:"Apr 2026", status:"completed", outcome:"Q2 review finished on time; peer feedback improved"}] },
+      infractions:[], leave:{balance:9, takenYTD:6, upcoming:null},
+      reportsTo:"CTO", directReports:["2 backend engineers","1 SRE"], tenureYears:3.4, tenure:"3.4 yrs", orgLabel:"Engineering",
+      coaching:[{id:1, skill:"Cross-team Communication", category:"Leadership", goal:"Present the Q1 architecture review without over-explaining edge cases", evidence:"Q1 review ran 40 minutes over its slot", due:"Apr 2026", status:"completed", outcome:"Q2 review finished on time; peer feedback improved"}] },
 
-    { id:"priya", name:"Priya Anand", role:"Product Manager", cls:"Tactician", level:9,
-      hp:84, hpMax:100, sp:75, spMax:100,
-      stats:{Execution:70,Craft:75,Communication:88,Resilience:73,Strategy:78,Adaptability:80},
-      resistances:{Ambiguity:17,"Deadline Pressure":10,"Context-Switching":15,Conflict:9,Repetition:7},
-      loadout:[
-        {slot:"Primary Focus", name:"Loot Drop v2 Reward Spec", power:11},
-        {slot:"Secondary Focus", name:"Roadmap Planning", power:10},
-        {slot:"Core Toolkit", name:"Product Analytics Suite", power:12},
-        {slot:"Certification", name:"None on file", power:0},
-        {slot:"Support Process", name:"Backlog Grooming", power:8}
-      ],
-      skills:[{name:"Spec Writing",lvl:4},{name:"Prioritization",lvl:4},{name:"User Research",lvl:3},{name:"Stakeholder Alignment",lvl:4},{name:"Data Analysis",lvl:3}],
-      roles:{reportsTo:"CTO", directReports:[], tenure:"1.9 yrs", orgLabel:"Product"},
-      flavor:"Tactician — sequences the plan so nobody's blocked twice",
-      buffer:66, quest:{title:"Loot Drop v2 reward-type expansion spec", progress:35},
-      struggle:null, nextCheckin:{date:"Aug 4", type:"goal review"},
-      infractions:[],
-      leave:{balance:14, takenYTD:3, upcoming:null},
+    { id:"priya", name:"Priya Anand", title:"Product Manager", department:"Product",
+      capacity:84, capacityMax:100, focus:75, focusMax:100,
+      attributes:{Execution:70,Craft:75,Communication:88,Strategy:78,Adaptability:80,Resilience:73},
+      skills:{
+        "Strategic Thinking":[{name:"Prioritization",rating:4},{name:"Data Analysis",rating:3},{name:"User Research",rating:3}],
+        "Communication":[{name:"Stakeholder Alignment",rating:4},{name:"Spec Writing",rating:4}]
+      },
+      project:{ name:"Loot Drop v2 Reward-Type Expansion", priority:"Medium", progress:35,
+        objective:"Define spec for new reward types ahead of the Q4 roadmap.",
+        timeline:"Sep 2026", dependency:null },
+      blocker:null,
+      nextCheckin:{date:"Aug 4", type:"goal review"},
+      infractions:[], leave:{balance:14, takenYTD:3, upcoming:null},
+      reportsTo:"CTO", directReports:[], tenureYears:1.9, tenure:"1.9 yrs", orgLabel:"Product",
       coaching:[] },
 
-    { id:"devon", name:"Devon Cross", role:"Product Governance Lead", cls:"Auditor-Sentinel", level:11,
-      hp:45, hpMax:100, sp:30, spMax:100,
-      stats:{Execution:60,Craft:90,Communication:58,Resilience:55,Strategy:70,Adaptability:52},
-      resistances:{Ambiguity:15,"Deadline Pressure":7,"Context-Switching":9,Conflict:8,Repetition:12},
-      loadout:[
-        {slot:"Primary Focus", name:"Loot Drop Governance Audit", power:16},
-        {slot:"Secondary Focus", name:"Admin Panel Review", power:11},
-        {slot:"Core Toolkit", name:"Code Audit Playbook", power:15},
-        {slot:"Certification", name:"Security Compliance Cert", power:13},
-        {slot:"Support Process", name:"Escalation Protocol", power:6}
-      ],
-      skills:[{name:"Root-cause Analysis",lvl:5},{name:"Technical Writing",lvl:4},{name:"Cross-team Escalation",lvl:2},{name:"Threat Modeling",lvl:3},{name:"Stakeholder Comms",lvl:2}],
-      roles:{reportsTo:"COO", directReports:[], tenure:"2.1 yrs", orgLabel:"Product Gov."},
-      flavor:"Auditor-Sentinel — finds the one path nobody tested",
-      buffer:21, quest:{title:"Reconcile winner-selection logic — claim-order vs. secure random draw (Go socket service)", progress:70},
-      struggle:"Waiting on Platform Eng for socket-service repo access, 6 days",
+    { id:"devon", name:"Devon Cross", title:"Product Governance Lead", department:"Product Governance",
+      capacity:45, capacityMax:100, focus:30, focusMax:100,
+      attributes:{Execution:60,Craft:90,Communication:58,Strategy:70,Adaptability:52,Resilience:55},
+      skills:{
+        "Technical Execution":[{name:"Root-cause Analysis",rating:5},{name:"Threat Modeling",rating:3}],
+        "Communication":[{name:"Technical Writing",rating:4},{name:"Stakeholder Comms",rating:2},{name:"Cross-team Escalation",rating:2}]
+      },
+      project:{ name:"Loot Drop Governance Audit — Winner-Selection Logic", priority:"High", progress:70,
+        objective:"Reconcile claim-order vs. secure random draw discrepancy before next release.",
+        timeline:"Aug 2026", dependency:"Waiting on Platform Engineering for socket-service repo access" },
+      blocker:"Waiting on Platform Eng for socket-service repo access, 6 days",
       nextCheckin:{date:"Jul 31", type:"blocker review"},
-      infractions:[],
-      leave:{balance:11, takenYTD:5, upcoming:null},
-      coaching:[{skill:"Communication", goal:"Escalate cross-team blockers within 48h instead of waiting them out", evidence:"Socket-service access request sat 4 days before Devon flagged it", due:"Aug 8", status:"active"}] },
+      infractions:[], leave:{balance:11, takenYTD:5, upcoming:null},
+      reportsTo:"COO", directReports:[], tenureYears:2.1, tenure:"2.1 yrs", orgLabel:"Product Gov.",
+      coaching:[{id:2, skill:"Cross-team Escalation", category:"Communication", goal:"Escalate cross-team blockers within 48h instead of waiting them out", evidence:"Socket-service access request sat 4 days before Devon flagged it", due:"Aug 8", status:"active"}] },
 
-    { id:"renata", name:"Renata Silva", role:"Governance Team Lead", cls:"Warden", level:13,
-      hp:71, hpMax:100, sp:58, spMax:100,
-      stats:{Execution:68,Craft:80,Communication:74,Resilience:84,Strategy:72,Adaptability:63},
-      resistances:{Ambiguity:14,"Deadline Pressure":13,"Context-Switching":10,Conflict:15,Repetition:9},
-      loadout:[
-        {slot:"Primary Focus", name:"Q3 Compliance Sweep", power:14},
-        {slot:"Secondary Focus", name:"Policy Framework", power:12},
-        {slot:"Core Toolkit", name:"Audit Checklist Suite", power:13},
-        {slot:"Certification", name:"GRC Practitioner", power:11},
-        {slot:"Support Process", name:"Incident Log Review", power:9}
-      ],
-      skills:[{name:"Policy Design",lvl:4},{name:"Cross-functional Coordination",lvl:4},{name:"Risk Assessment",lvl:5},{name:"Coaching",lvl:3},{name:"Negotiation",lvl:2}],
-      roles:{reportsTo:"COO", directReports:["Aisha Bello (HR)","Tomas Varga (Finance)","Elin Kask (Legal)"], tenure:"4.0 yrs", orgLabel:"Governance"},
-      flavor:"Warden — keeps the walls standing so everyone else can build",
-      buffer:55, quest:{title:"Q3 compliance audit sweep — HR, Finance, Legal", progress:44},
-      struggle:null, nextCheckin:{date:"Aug 6", type:"1:1"},
-      infractions:[],
-      leave:{balance:6, takenYTD:12, upcoming:null},
+    { id:"renata", name:"Renata Silva", title:"Governance Team Lead", department:"Governance",
+      capacity:71, capacityMax:100, focus:58, focusMax:100,
+      attributes:{Execution:68,Craft:80,Communication:74,Strategy:72,Adaptability:63,Resilience:84},
+      skills:{
+        "Leadership":[{name:"Cross-functional Coordination",rating:4},{name:"Coaching",rating:3},{name:"Negotiation",rating:2}],
+        "Strategic Thinking":[{name:"Policy Design",rating:4},{name:"Risk Assessment",rating:5}]
+      },
+      project:{ name:"Q3 Compliance Audit Sweep", priority:"Medium", progress:44,
+        objective:"Complete compliance review across HR, Finance, and Legal.",
+        timeline:"Sep 2026", dependency:null },
+      blocker:null,
+      nextCheckin:{date:"Aug 6", type:"1:1"},
+      infractions:[], leave:{balance:6, takenYTD:12, upcoming:null},
+      reportsTo:"COO", directReports:["Aisha Bello (HR)","Tomas Varga (Finance)","Elin Kask (Legal)"], tenureYears:4.0, tenure:"4.0 yrs", orgLabel:"Governance",
       coaching:[] },
 
-    { id:"sana", name:"Sana Rocha", role:"Business Operations Lead", cls:"Ranger", level:8,
-      hp:58, hpMax:100, sp:33, spMax:100,
-      stats:{Execution:74,Craft:66,Communication:69,Resilience:57,Strategy:55,Adaptability:72},
-      resistances:{Ambiguity:10,"Deadline Pressure":6,"Context-Switching":13,Conflict:7,Repetition:8},
-      loadout:[
-        {slot:"Primary Focus", name:"Vendor Contract Renewals", power:10},
-        {slot:"Secondary Focus", name:"Logistics Coverage", power:9},
-        {slot:"Core Toolkit", name:"Contract Tracker", power:8},
-        {slot:"Certification", name:"None on file", power:0},
-        {slot:"Support Process", name:"Renewal Reminders", power:6}
-      ],
-      skills:[{name:"Vendor Negotiation",lvl:3},{name:"Process Design",lvl:2},{name:"Contract Review",lvl:2},{name:"Prioritization",lvl:2},{name:"Time Management",lvl:2}],
-      roles:{reportsTo:"COO", directReports:[], tenure:"1.3 yrs", orgLabel:"Biz Ops"},
-      flavor:"Ranger — covers more ground than the headcount suggests",
-      buffer:24, quest:{title:"Vendor contract renewals — logistics", progress:20},
-      struggle:"Renewal backlog growing faster than she can review it",
+    { id:"sana", name:"Sana Rocha", title:"Business Operations Lead", department:"Business Operations",
+      capacity:58, capacityMax:100, focus:33, focusMax:100,
+      attributes:{Execution:74,Craft:66,Communication:69,Strategy:55,Adaptability:72,Resilience:57},
+      skills:{
+        "Communication":[{name:"Vendor Negotiation",rating:3},{name:"Prioritization",rating:2}],
+        "Craft & Domain":[{name:"Process Design",rating:2},{name:"Contract Review",rating:2},{name:"Time Management",rating:2}]
+      },
+      project:{ name:"Vendor Contract Renewals", priority:"High", progress:20,
+        objective:"Clear the vendor renewal backlog before Q3 close.",
+        timeline:"Aug 2026", dependency:"Backlog outpacing current review capacity" },
+      blocker:"Renewal backlog growing faster than she can review it",
       nextCheckin:{date:"Aug 1", type:"1:1"},
       infractions:[{date:"Jun 12", note:"Missed a vendor renewal deadline — verbal reminder given, no repeat since", severity:"low"}],
       leave:{balance:4, takenYTD:3, upcoming:{start:"Aug 4", end:"Aug 8"}},
+      reportsTo:"COO", directReports:[], tenureYears:1.3, tenure:"1.3 yrs", orgLabel:"Business Ops",
       coaching:[] },
 
-    { id:"jonah", name:"Jonah Reyes", role:"Creative Director", cls:"Bard", level:10,
-      hp:88, hpMax:100, sp:70, spMax:100,
-      stats:{Execution:79,Craft:84,Communication:90,Resilience:68,Strategy:74,Adaptability:77},
-      resistances:{Ambiguity:16,"Deadline Pressure":11,"Context-Switching":14,Conflict:12,Repetition:6},
-      loadout:[
-        {slot:"Primary Focus", name:"Loot Drop Launch Campaign", power:15},
-        {slot:"Secondary Focus", name:"Brand Refresh", power:10},
-        {slot:"Core Toolkit", name:"Creative Pipeline Suite", power:13},
-        {slot:"Certification", name:"None on file", power:0},
-        {slot:"Support Process", name:"Creator Relations", power:11}
-      ],
-      skills:[{name:"Storytelling",lvl:5},{name:"Art Direction",lvl:4},{name:"Campaign Strategy",lvl:3},{name:"Cross-team Pitching",lvl:4},{name:"Budget Planning",lvl:2}],
-      roles:{reportsTo:"CTO", directReports:["2 designers","1 copywriter"], tenure:"2.8 yrs", orgLabel:"Creative"},
-      flavor:"Bard — turns a feature list into a reason to care",
-      buffer:62, quest:{title:"Loot Drop launch campaign — creator kit", progress:66},
-      struggle:null, nextCheckin:{date:"Aug 5", type:"goal review"},
-      infractions:[],
-      leave:{balance:12, takenYTD:4, upcoming:null},
+    { id:"jonah", name:"Jonah Reyes", title:"Creative Director", department:"Creative",
+      capacity:88, capacityMax:100, focus:70, focusMax:100,
+      attributes:{Execution:79,Craft:84,Communication:90,Strategy:74,Adaptability:77,Resilience:68},
+      skills:{
+        "Communication":[{name:"Storytelling",rating:5},{name:"Cross-team Pitching",rating:4},{name:"Presentation",rating:4}],
+        "Craft & Domain":[{name:"Art Direction",rating:4},{name:"Campaign Strategy",rating:3}]
+      },
+      project:{ name:"Loot Drop Launch Campaign — Creator Kit", priority:"Low", progress:66,
+        objective:"Deliver creator marketing assets ahead of public launch.",
+        timeline:"Aug 2026", dependency:null },
+      blocker:null,
+      nextCheckin:{date:"Aug 5", type:"goal review"},
+      infractions:[], leave:{balance:12, takenYTD:4, upcoming:null},
+      reportsTo:"CTO", directReports:["2 designers","1 copywriter"], tenureYears:2.8, tenure:"2.8 yrs", orgLabel:"Creative",
       coaching:[] },
 
-    { id:"aisha", name:"Aisha Bello", role:"People & Talent Lead", cls:"Cleric", level:12,
-      hp:80, hpMax:100, sp:62, spMax:100,
-      stats:{Execution:66,Craft:78,Communication:92,Resilience:80,Strategy:61,Adaptability:68},
-      resistances:{Ambiguity:11,"Deadline Pressure":12,"Context-Switching":9,Conflict:17,Repetition:10},
-      loadout:[
-        {slot:"Primary Focus", name:"Onboarding Skill-Tree Refresh", power:12},
-        {slot:"Secondary Focus", name:"Talent Pipeline", power:10},
-        {slot:"Core Toolkit", name:"HRIS Platform", power:14},
-        {slot:"Certification", name:"SHRM-CP", power:13},
-        {slot:"Support Process", name:"Exit Interview Protocol", power:8}
-      ],
-      skills:[{name:"Conflict Mediation",lvl:5},{name:"Coaching",lvl:4},{name:"Talent Sourcing",lvl:3},{name:"Employment Law Basics",lvl:3},{name:"Onboarding Design",lvl:4}],
-      roles:{reportsTo:"Renata Silva", directReports:["1 recruiter","1 HR generalist"], tenure:"3.6 yrs", orgLabel:"HR"},
-      flavor:"Cleric — the team's HP bar stays green because of her",
-      buffer:58, quest:{title:"Refresh onboarding skill-tree templates", progress:51},
-      struggle:null, nextCheckin:{date:"Jul 30", type:"1:1"},
-      infractions:[],
-      leave:{balance:8, takenYTD:8, upcoming:null},
-      coaching:[{skill:"Strategy", goal:"Bring a phased staffing plan, not just a headcount ask, to review", evidence:"Q4 headcount request lacked a phasing plan and got sent back", due:"Feb 2026", status:"completed", outcome:"Q1 headcount plan approved on first pass"}] },
+    { id:"aisha", name:"Aisha Bello", title:"People & Talent Lead", department:"People & Talent",
+      capacity:80, capacityMax:100, focus:62, focusMax:100,
+      attributes:{Execution:66,Craft:78,Communication:92,Strategy:61,Adaptability:68,Resilience:80},
+      skills:{
+        "Communication":[{name:"Conflict Resolution",rating:5},{name:"Coaching",rating:4},{name:"Active Listening",rating:4}],
+        "Craft & Domain":[{name:"Talent Sourcing",rating:3},{name:"Onboarding Design",rating:4}]
+      },
+      project:{ name:"Onboarding Program Refresh", priority:"Low", progress:51,
+        objective:"Modernize onboarding materials and manager coaching templates.",
+        timeline:"Sep 2026", dependency:null },
+      blocker:null,
+      nextCheckin:{date:"Jul 30", type:"1:1"},
+      infractions:[], leave:{balance:8, takenYTD:8, upcoming:null},
+      reportsTo:"Renata Silva", directReports:["1 recruiter","1 HR generalist"], tenureYears:3.6, tenure:"3.6 yrs", orgLabel:"People & Talent",
+      coaching:[{id:3, skill:"Strategic Thinking", category:"Strategic Thinking", goal:"Bring a phased staffing plan, not just a headcount ask, to review", evidence:"Q4 headcount request lacked a phasing plan and got sent back", due:"Feb 2026", status:"completed", outcome:"Q1 headcount plan approved on first pass"}] },
 
-    { id:"tomas", name:"Tomas Varga", role:"Finance Lead", cls:"Alchemist", level:15,
-      hp:67, hpMax:100, sp:51, spMax:100,
-      stats:{Execution:62,Craft:89,Communication:54,Resilience:76,Strategy:80,Adaptability:50},
-      resistances:{Ambiguity:9,"Deadline Pressure":14,"Context-Switching":7,Conflict:6,Repetition:15},
-      loadout:[
-        {slot:"Primary Focus", name:"Q4 Runway Model", power:14},
-        {slot:"Secondary Focus", name:"Payroll Ops", power:16},
-        {slot:"Core Toolkit", name:"Financial Modeling Suite", power:17},
-        {slot:"Certification", name:"CFA Level II", power:15},
-        {slot:"Support Process", name:"Expense Approval Queue", power:9}
-      ],
-      skills:[{name:"Financial Modeling",lvl:5},{name:"Forecasting",lvl:5},{name:"Board Reporting",lvl:3},{name:"Cross-team Budgeting",lvl:2},{name:"Vendor Cost Analysis",lvl:3}],
-      roles:{reportsTo:"Renata Silva", directReports:["1 AP/AR analyst"], tenure:"4.7 yrs", orgLabel:"Finance"},
-      flavor:"Alchemist — transmutes spreadsheets into runway",
-      buffer:47, quest:{title:"Runway model refresh for Q4", progress:30},
-      struggle:null, nextCheckin:{date:"Aug 3", type:"finance snapshot"},
-      infractions:[],
-      leave:{balance:15, takenYTD:1, upcoming:null},
-      coaching:[{skill:"Communication", goal:"Share the Q4 model draft with COO before it's finished, not after", evidence:"Q2 model surprised the leadership review by 2 weeks", due:"Aug 3", status:"active"}] },
+    { id:"tomas", name:"Tomas Varga", title:"Finance Lead", department:"Finance",
+      capacity:67, capacityMax:100, focus:51, focusMax:100,
+      attributes:{Execution:62,Craft:89,Communication:54,Strategy:80,Adaptability:50,Resilience:76},
+      skills:{
+        "Strategic Thinking":[{name:"Financial Modeling",rating:5},{name:"Forecasting",rating:5},{name:"Board Reporting",rating:3}],
+        "Craft & Domain":[{name:"Vendor Cost Analysis",rating:3}]
+      },
+      project:{ name:"Q4 Runway Model Refresh", priority:"Medium", progress:30,
+        objective:"Update the financial model ahead of Q4 board review.",
+        timeline:"Oct 2026", dependency:null },
+      blocker:null,
+      nextCheckin:{date:"Aug 3", type:"finance snapshot"},
+      infractions:[], leave:{balance:15, takenYTD:1, upcoming:null},
+      reportsTo:"Renata Silva", directReports:["1 AP/AR analyst"], tenureYears:4.7, tenure:"4.7 yrs", orgLabel:"Finance",
+      coaching:[{id:4, skill:"Board Reporting", category:"Strategic Thinking", goal:"Share the Q4 model draft with COO before it's finished, not after", evidence:"Q2 model surprised the leadership review by 2 weeks", due:"Aug 3", status:"active"}] },
 
-    { id:"elin", name:"Elin Kask", role:"Legal Lead", cls:"Loremaster", level:16,
-      hp:39, hpMax:100, sp:22, spMax:100,
-      stats:{Execution:52,Craft:94,Communication:60,Resilience:66,Strategy:77,Adaptability:44},
-      resistances:{Ambiguity:13,"Deadline Pressure":5,"Context-Switching":8,Conflict:11,Repetition:18},
-      loadout:[
-        {slot:"Primary Focus", name:"NDA Backlog Clearance", power:11},
-        {slot:"Secondary Focus", name:"Partnership Agreements", power:13},
-        {slot:"Core Toolkit", name:"Contract Repository", power:16},
-        {slot:"Certification", name:"Bar Admission", power:18},
-        {slot:"Support Process", name:"Paralegal Support", power:0}
-      ],
-      skills:[{name:"Contract Drafting",lvl:5},{name:"Risk Flagging",lvl:5},{name:"IP Strategy",lvl:4},{name:"Negotiation",lvl:3},{name:"Regulatory Research",lvl:4}],
-      roles:{reportsTo:"Renata Silva", directReports:[], tenure:"5.2 yrs", orgLabel:"Legal"},
-      flavor:"Loremaster — keeper of every clause anyone's ever signed",
-      buffer:14, quest:{title:"NDA backlog clearance", progress:22},
-      struggle:"NDA queue at 31 open, no paralegal support since April",
+    { id:"elin", name:"Elin Kask", title:"Legal Lead", department:"Legal",
+      capacity:39, capacityMax:100, focus:22, focusMax:100,
+      attributes:{Execution:52,Craft:94,Communication:60,Strategy:77,Adaptability:44,Resilience:66},
+      skills:{
+        "Craft & Domain":[{name:"Contract Drafting",rating:5},{name:"Risk Flagging",rating:5},{name:"Regulatory Research",rating:4}],
+        "Strategic Thinking":[{name:"IP Strategy",rating:4},{name:"Negotiation",rating:3}]
+      },
+      project:{ name:"NDA Backlog Clearance", priority:"High", progress:22,
+        objective:"Clear the outstanding NDA queue and restore normal turnaround time.",
+        timeline:"Aug 2026", dependency:"No paralegal support since April" },
+      blocker:"NDA queue at 31 open, no paralegal support since April",
       nextCheckin:{date:"Jul 30", type:"blocker review"},
-      infractions:[],
-      leave:{balance:3, takenYTD:2, upcoming:null},
+      infractions:[], leave:{balance:3, takenYTD:2, upcoming:null},
+      reportsTo:"Renata Silva", directReports:[], tenureYears:5.2, tenure:"5.2 yrs", orgLabel:"Legal",
       coaching:[] }
   ];
 
   var peopleById = {};
-  var nextCoachingId = 1;
+  var nextCoachingId = 5;
   people.forEach(function (p) {
     peopleById[p.id] = p;
-    p.morale = Math.round(p.stats.Resilience / 10);
-    p.coaching.forEach(function (c) { c.id = nextCoachingId++; });
+    p.morale = Math.round(p.attributes.Resilience / 10);
   });
 
-  function severity(p) {
-    if (p.struggle && p.hp < 50) return 3;
-    if (p.struggle || p.hp < 65) return 2;
-    return 1;
+  function riskLevel(p) {
+    if (p.blocker && p.capacity < 50) return "High";
+    if (p.blocker || p.capacity < 65) return "Medium";
+    return "Low";
   }
-  var ranked = people.slice().sort(function (a, b) { return severity(b) - severity(a) || a.hp - b.hp; });
-  var activeParty = ranked.slice(0, 5);
-  var reserve = ranked.slice(5);
+  function riskWeight(level) { return level === "High" ? 3 : level === "Medium" ? 2 : 1; }
+  function loyaltyLevel(years) { return years >= 4 ? "High" : years >= 2 ? "Steady" : "Building"; }
 
-  var selectedId = activeParty[0].id;
+  var ranked = people.slice().sort(function (a, b) { return riskWeight(riskLevel(b)) - riskWeight(riskLevel(a)) || a.capacity - b.capacity; });
+  var attentionGroup = ranked.slice(0, 5);
+  var steadyGroup = ranked.slice(5);
+
+  var selectedId = attentionGroup[0].id;
   var activeTab = "attributes";
-  var completingQuestId = null;          // Feature B — coaching quest currently showing its "confirm completion" form
-  var personalRecordRevealed = {};       // Feature C — { personId: true } once the sealed section has been clicked open
+  var completingQuestId = null;
+  var personalRecordRevealed = {};
+  var currentView = "overview";
 
-  function icon(id) { return '<svg><use href="#' + id + '"></use></svg>'; }
-  function hpClass(pct) { return pct < 50 ? "crit" : pct < 65 ? "warn" : ""; }
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-
-  function parseCheckinDate(str) { return new Date("2026 " + str); }
-  function lowestStat(p) { var low = null; STATS.forEach(function (k) { if (!low || p.stats[k] < p.stats[low]) low = k; }); return low; }
-  function highestStat(p) { var high = null; STATS.forEach(function (k) { if (!high || p.stats[k] > p.stats[high]) high = k; }); return high; }
-  function avgStat(p) { return STATS.reduce(function (s, k) { return s + p.stats[k]; }, 0) / STATS.length; }
-
-  /* ---------- Party rail ---------- */
-  function renderRail() {
-    document.getElementById("activeCount").textContent = activeParty.length + " / 5";
-    document.getElementById("reserveCount").textContent = reserve.length + " on bench";
-
-    document.getElementById("slotList").innerHTML = activeParty.map(function (p, i) {
-      var hpPct = Math.round(p.hp / p.hpMax * 100), spPct = Math.round(p.sp / p.spMax * 100);
-      return '<button class="slot-card' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
-        '<span class="slot-num">' + (i + 1) + '</span>' +
-        '<span class="portrait">' + initials(p.name) + '</span>' +
-        '<span class="slot-meta">' +
-          '<span class="slot-name-row"><span class="slot-name">' + p.name + '</span><span class="slot-lv">Lv ' + p.level + '</span></span>' +
-          '<span class="mini-bars">' +
-            '<span class="mini-track"><span class="mini-fill hp ' + hpClass(hpPct) + '" style="width:' + hpPct + '%"></span></span>' +
-            '<span class="mini-track"><span class="mini-fill sp" style="width:' + spPct + '%"></span></span>' +
-          '</span>' +
-        '</span>' +
-        '</button>';
-    }).join("");
-
-    document.getElementById("reserveTiles").innerHTML = reserve.map(function (p) {
-      return '<button class="roster-tile' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
-        '<span class="portrait">' + initials(p.name) + '</span>' +
-        '<span class="rname">' + p.name.split(" ")[0] + '</span>' +
-        '<span class="rrole">' + p.role + '</span>' +
-        '</button>';
-    }).join("");
-  }
-
+  function icon(id) { return '<svg><use href="#' + id + '"></use></svg>'; }
   function initials(name) { return name.split(" ").map(function (w) { return w[0]; }).join(""); }
+  function capacityClass(pct) { return pct < 50 ? "risk" : pct < 65 ? "warn" : ""; }
+  function parseCheckinDate(str) { return new Date("2026 " + str); }
 
-  /* ---------- People KPIs + Spotlight ---------- */
-  function renderPeopleKPIs() {
-    var activeCoaching = people.reduce(function (n, p) { return n + p.coaching.filter(function (c) { return c.status !== "completed"; }).length; }, 0);
-    var openInfractions = people.reduce(function (n, p) { return n + p.infractions.length; }, 0);
-    var needsAttention = people.filter(function (p) { return severity(p) > 1; }).length;
-    var kpis = [
-      { label: "Headcount", value: String(people.length), delta: "stable", tone: "flat" },
-      { label: "Needs Attention", value: String(needsAttention), delta: needsAttention > 3 ? "elevated" : "normal", tone: needsAttention > 3 ? "warning" : "good" },
-      { label: "Coaching Quests Active", value: String(activeCoaching), delta: "tracked", tone: "good" },
-      { label: "Open Infractions", value: String(openInfractions), delta: openInfractions > 0 ? "review" : "clean", tone: openInfractions > 0 ? "warning" : "good" }
-    ];
-    document.getElementById("peopleKpiRow").innerHTML = kpis.map(function (k) {
-      return '<div class="kpi"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+  function lowestAttr(p) { var low = null; ATTRS.forEach(function (k) { if (!low || p.attributes[k] < p.attributes[low]) low = k; }); return low; }
+  function highestAttr(p) { var high = null; ATTRS.forEach(function (k) { if (!high || p.attributes[k] > p.attributes[high]) high = k; }); return high; }
+  function avgAttr(p) { return ATTRS.reduce(function (s, k) { return s + p.attributes[k]; }, 0) / ATTRS.length; }
+
+  function flattenSkills(p) {
+    var out = [];
+    Object.keys(p.skills).forEach(function (cat) {
+      p.skills[cat].forEach(function (s) { out.push({ category: cat, name: s.name, rating: s.rating }); });
+    });
+    return out;
+  }
+  function lowestSkill(p) {
+    var flat = flattenSkills(p), low = null;
+    flat.forEach(function (s) { if (!low || s.rating < low.rating) low = s; });
+    return low;
+  }
+
+  /* ================= COMMAND BAR / NAVIGATION ================= */
+  function renderCommandBar() {
+    document.getElementById("commandBar").innerHTML = NAV.map(function (n) {
+      return '<button class="cmd-btn' + (n.id === currentView ? " active" : "") + '" data-nav="' + n.id + '">' + icon(n.icon) + '<span>' + n.label + '</span></button>';
     }).join("");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-nav]"), function (btn) {
+      btn.addEventListener("click", function () { switchView(btn.getAttribute("data-nav")); });
+    });
   }
 
-  function renderSpotlight() {
-    var pool = reserve.length ? reserve : people;
-    var best = pool.slice().sort(function (a, b) { return avgStat(b) - avgStat(a); })[0];
-    var bestKey = highestStat(best);
-    document.getElementById("recognizePanel").innerHTML =
-      '<div class="panel-head"><h3>Recognize</h3><div class="hint">Steady + highest composite score</div></div>' +
-      '<div class="detail-header" style="align-items:center;">' +
-        '<span class="portrait" style="width:44px;height:44px;font-size:14px;">' + initials(best.name) + '</span>' +
-        '<span class="detail-id"><span class="detail-name" style="font-size:15px;">' + best.name + '</span><span class="detail-role">' + best.role + '</span></span>' +
+  function switchView(view) {
+    currentView = view;
+    NAV.forEach(function (n) {
+      document.getElementById("view-" + n.id).hidden = n.id !== view;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-nav]"), function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-nav") === view);
+    });
+  }
+
+  /* ================= SHARED: RECOGNITION + COACHING PRIORITY ================= */
+  function recognitionCandidate() {
+    var pool = steadyGroup.length ? steadyGroup : people;
+    return pool.slice().sort(function (a, b) { return avgAttr(b) - avgAttr(a); })[0];
+  }
+  function renderRecognitionInto(elId) {
+    var best = recognitionCandidate();
+    var bestKey = highestAttr(best);
+    document.getElementById(elId).innerHTML =
+      '<div class="frame-head"><h3>' + icon("ic-star") + ' &nbsp;Recognition</h3><div class="hint">Steady, highest composite score</div></div>' +
+      '<div class="recognition-card">' +
+        '<span class="portrait gold">' + initials(best.name) + '</span>' +
+        '<div><div style="font-weight:800;font-size:15px;">' + esc(best.name) + '</div><div style="font-size:12px;color:var(--text-secondary);">' + esc(best.title) + ' · ' + esc(best.department) + '</div></div>' +
       '</div>' +
-      '<p style="font-size:12.5px;color:var(--text-secondary);margin:10px 0 0;">Leading the roster on ' + bestKey + ' (' + best.stats[bestKey] + ') while holding steady status — worth calling out this cycle.</p>';
-
-    var counts = {};
-    people.forEach(function (p) { var l = lowestStat(p); counts[l] = (counts[l] || 0) + 1; });
-    var topGap = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; })[0];
-    document.getElementById("coachPriorityPanel").innerHTML =
-      '<div class="panel-head"><h3>Team Coaching Priority</h3><div class="hint">Org-wide growth edge</div></div>' +
-      '<p style="font-size:12.5px;color:var(--text-secondary);">' + counts[topGap] + ' of ' + people.length + ' team members show <strong style="color:var(--accent-strong);">' + topGap + '</strong> as their lowest attribute — the highest-leverage skill to build coaching templates around this quarter.</p>';
+      '<p class="recognition-copy">Leading the roster on ' + bestKey + ' (' + best.attributes[bestKey] + ') while holding steady. Worth calling out this cycle — a shout-out here reinforces the behavior, not just the outcome.</p>';
   }
 
-  /* ---------- Radar chart ---------- */
-  function buildRadar(stats) {
-    var keys = STATS, n = keys.length, cx = 100, cy = 100, R = 74;
+  function coachingPriorityData() {
+    var counts = {};
+    people.forEach(function (p) { var l = lowestAttr(p); counts[l] = (counts[l] || 0) + 1; });
+    var topKey = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; })[0];
+    return { topKey: topKey, count: counts[topKey] };
+  }
+  function renderCoachingPriorityInto(elId) {
+    var d = coachingPriorityData();
+    document.getElementById(elId).innerHTML =
+      '<div class="frame-head"><h3>Team Coaching Priority</h3><div class="hint">Org-wide growth edge</div></div>' +
+      '<p style="font-size:12.5px;color:var(--text-secondary);">' + d.count + ' of ' + people.length + ' team members show <strong style="color:var(--lavender);">' + d.topKey + '</strong> as their lowest attribute — the highest-leverage area to build coaching plans around this quarter.</p>';
+  }
+
+  /* ================= RADAR ================= */
+  function buildRadar(attrs) {
+    var keys = ATTRS, n = keys.length, cx = 100, cy = 100, R = 74;
     var rings = [0.33, 0.66, 1].map(function (f) {
       var pts = keys.map(function (_, i) {
         var a = (-90 + i * 360 / n) * Math.PI / 180;
         return (cx + Math.cos(a) * R * f) + "," + (cy + Math.sin(a) * R * f);
       }).join(" ");
-      return '<polygon points="' + pts + '" fill="none" stroke="var(--border)" stroke-width="1" />';
+      return '<polygon points="' + pts + '" fill="none" stroke="var(--border-neutral)" stroke-width="1" />';
     }).join("");
     var axes = keys.map(function (_, i) {
       var a = (-90 + i * 360 / n) * Math.PI / 180;
       var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
-      return '<line x1="' + cx + '" y1="' + cy + '" x2="' + x + '" y2="' + y + '" stroke="var(--border)" stroke-width="1" />';
+      return '<line x1="' + cx + '" y1="' + cy + '" x2="' + x + '" y2="' + y + '" stroke="var(--border-neutral)" stroke-width="1" />';
     }).join("");
     var dataPts = keys.map(function (k, i) {
       var a = (-90 + i * 360 / n) * Math.PI / 180;
-      var v = stats[k] / 100;
+      var v = attrs[k] / 100;
       return (cx + Math.cos(a) * R * v) + "," + (cy + Math.sin(a) * R * v);
     });
     var dots = keys.map(function (k, i) {
       var a = (-90 + i * 360 / n) * Math.PI / 180;
-      var v = stats[k] / 100;
+      var v = attrs[k] / 100;
       var x = cx + Math.cos(a) * R * v, y = cy + Math.sin(a) * R * v;
-      return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="var(--accent-strong)" />';
+      return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="var(--cyan-strong)" />';
     }).join("");
-
     return '<svg viewBox="0 0 200 200" width="200" height="200">' + rings + axes +
-      '<polygon points="' + dataPts.join(" ") + '" fill="var(--accent)" fill-opacity="0.28" stroke="var(--accent)" stroke-width="2" />' +
+      '<polygon points="' + dataPts.join(" ") + '" fill="var(--cyan)" fill-opacity="0.24" stroke="var(--cyan)" stroke-width="2" />' +
       dots + '</svg>';
   }
 
-  /* ---------- Detail panel ---------- */
-  var TAB_LABELS = { attributes: "Attributes", loadout: "Loadout", skills: "Skills & Coaching", roles: "Dossier" };
-  var TAB_ORDER = ["attributes", "loadout", "skills", "roles"];
+  /* ================= PEOPLE SECTION ================= */
+  function renderRoster() {
+    document.getElementById("peopleActiveCount").textContent = attentionGroup.length + " / " + people.length;
+    document.getElementById("peopleBenchCount").textContent = steadyGroup.length + " steady";
 
-  function cycleTab(dir) {
-    var idx = TAB_ORDER.indexOf(activeTab);
-    idx = (idx + dir + TAB_ORDER.length) % TAB_ORDER.length;
-    activeTab = TAB_ORDER[idx];
-    renderDetail();
+    document.getElementById("peopleActiveList").innerHTML = attentionGroup.map(function (p) {
+      var pct = Math.round(p.capacity / p.capacityMax * 100), fpct = Math.round(p.focus / p.focusMax * 100);
+      var risk = riskLevel(p);
+      return '<button class="roster-card' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
+        '<span class="portrait">' + initials(p.name) + '</span>' +
+        '<span class="roster-meta">' +
+          '<span class="roster-name-row"><span class="roster-name">' + esc(p.name) + '</span><span class="risk-chip ' + risk + '">' + risk + '</span></span>' +
+          '<span class="roster-bars">' +
+            '<span class="mini-track"><span class="mini-fill cap ' + capacityClass(pct) + '" style="width:' + pct + '%"></span></span>' +
+            '<span class="mini-track"><span class="mini-fill focus" style="width:' + fpct + '%"></span></span>' +
+          '</span>' +
+        '</span>' +
+        '</button>';
+    }).join("");
+
+    document.getElementById("peopleBenchTiles").innerHTML = steadyGroup.map(function (p) {
+      return '<button class="bench-tile' + (p.id === selectedId ? " selected" : "") + '" data-select="' + p.id + '">' +
+        '<span class="portrait">' + initials(p.name) + '</span>' +
+        '<span class="bname">' + esc(p.name.split(" ")[0]) + '</span>' +
+        '<span class="btitle">' + esc(p.title) + '</span>' +
+        '</button>';
+    }).join("");
   }
 
-  /* ---- Feature C: gated Personal Record section (lives inside the Dossier tab) ---- */
-  function renderPersonalRecordSection(p) {
+  var PROFILE_TAB_LABELS = { attributes: "Attributes", skills: "Skills", work: "Work", coaching: "Coaching", record: "Record" };
+  var PROFILE_TAB_ORDER = ["attributes", "skills", "work", "coaching", "record"];
+
+  function cycleTab(dir) {
+    var idx = PROFILE_TAB_ORDER.indexOf(activeTab);
+    idx = (idx + dir + PROFILE_TAB_ORDER.length) % PROFILE_TAB_ORDER.length;
+    activeTab = PROFILE_TAB_ORDER[idx];
+    renderProfile();
+  }
+
+  function renderSealedRecord(p) {
     var revealed = !!personalRecordRevealed[p.id];
     var pr = p.personalRecord || {};
-
     if (!revealed) {
-      return '<div class="panel" style="margin-top:14px;border-style:dashed;">' +
+      return '<div class="frame sealed">' +
         '<div class="subpanel-title">' + icon("ic-lock") + ' &nbsp;Personal Record</div>' +
         '<p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">Legal name, date of birth, working style, zodiac sign, MBTI type — self-reported at onboarding, for coaching context only.</p>' +
-        '<button type="button" class="submit-btn" data-reveal="' + p.id + '" style="background:var(--surface-raised);color:var(--accent-strong);border:1px solid var(--border);">Reveal Personal Record</button>' +
+        '<button type="button" class="btn-quiet" data-reveal="' + p.id + '">Reveal Personal Record</button>' +
         '</div>';
     }
-
-    return '<div class="panel" style="margin-top:14px;border-style:dashed;">' +
+    return '<div class="frame sealed">' +
       '<div class="subpanel-title">' + icon("ic-unlock") + ' &nbsp;Personal Record</div>' +
-      '<p style="font-size:11.5px;color:var(--warning);margin:0 0 12px;">Not used in employment, compensation, or promotion decisions. Self-reported and optional — see the PRD’s Privacy &amp; Compliance section before this ever touches real employee data.</p>' +
+      '<p class="sealed-notice">Not used in employment, compensation, or promotion decisions. Self-reported and optional.</p>' +
       '<form class="coach-form" id="personalRecordForm" data-person="' + p.id + '">' +
         '<div class="field"><label for="prLegalName">Legal name</label><input id="prLegalName" type="text" value="' + esc(pr.legalName) + '" placeholder="Optional" /></div>' +
         '<div class="field"><label for="prDob">Date of birth</label><input id="prDob" type="date" value="' + esc(pr.dob) + '" /></div>' +
@@ -355,72 +352,74 @@
         '<div class="field"><label for="prMotivators">Motivators</label><input id="prMotivators" type="text" value="' + esc(pr.motivators) + '" placeholder="e.g. Ownership, learning new systems" /></div>' +
         '<div class="field"><label for="prZodiac">Zodiac sign <em>(optional, informational only)</em></label><input id="prZodiac" type="text" value="' + esc(pr.zodiac) + '" /></div>' +
         '<div class="field"><label for="prMbti">MBTI type <em>(optional, self-reported only)</em></label><input id="prMbti" type="text" value="' + esc(pr.mbti) + '" placeholder="e.g. INFJ" /></div>' +
-        '<button type="submit" class="submit-btn">Save Personal Record</button>' +
+        '<button type="submit" class="btn-primary">Save Personal Record</button>' +
       '</form>' +
       (pr.savedAt ? '<p style="font-size:10.5px;color:var(--text-muted);margin-top:8px;">Last saved ' + new Date(pr.savedAt).toLocaleString() + '</p>' : '') +
       '</div>';
   }
 
-  function renderDetail() {
+  function renderProfile() {
     var p = peopleById[selectedId];
-    var hpPct = Math.round(p.hp / p.hpMax * 100), spPct = Math.round(p.sp / p.spMax * 100);
+    var pct = Math.round(p.capacity / p.capacityMax * 100), fpct = Math.round(p.focus / p.focusMax * 100);
+    var risk = riskLevel(p);
 
     var header =
-      '<div class="detail-header">' +
-        '<span class="detail-portrait">' + initials(p.name) + '</span>' +
-        '<span class="detail-id">' +
-          '<span class="detail-name">' + p.name + '</span>' +
-          '<span class="detail-role">' + p.role + ' · ' + p.cls + '</span>' +
-          '<span class="detail-flavor">' + p.flavor + '</span>' +
+      '<div class="profile-header">' +
+        '<span class="profile-portrait">' + initials(p.name) + '</span>' +
+        '<span class="profile-id">' +
+          '<span class="profile-name">' + esc(p.name) + '</span>' +
+          '<span class="profile-title">' + esc(p.title) + '</span>' +
+          '<span class="profile-dept">' + esc(p.department) + '</span>' +
         '</span>' +
-        '<span class="detail-lv">LV ' + p.level + '</span>' +
+        '<span class="profile-risk risk-chip ' + risk + '" style="font-size:10.5px;padding:4px 10px;">' + risk + ' Risk</span>' +
       '</div>' +
-      '<div class="status-bar-row">' +
-        '<div class="status-bar"><div class="status-bar-label"><span>Capacity (HP)</span><span>' + p.hp + '/' + p.hpMax + '</span></div>' +
-          '<div class="bar-track"><div class="bar-fill mini-fill hp ' + hpClass(hpPct) + '" style="width:' + hpPct + '%"></div></div></div>' +
-        '<div class="status-bar"><div class="status-bar-label"><span>Focus (SP)</span><span>' + p.sp + '/' + p.spMax + '</span></div>' +
-          '<div class="bar-track"><div class="bar-fill mini-fill sp" style="width:' + spPct + '%"></div></div></div>' +
+      '<div class="status-row">' +
+        '<div class="status-cell"><div class="status-label"><span>Capacity</span><span>' + p.capacity + '%</span></div><div class="bar-track"><div class="bar-fill mini-fill cap ' + capacityClass(pct) + '" style="width:' + pct + '%"></div></div></div>' +
+        '<div class="status-cell"><div class="status-label"><span>Focus</span><span>' + p.focus + '%</span></div><div class="bar-track"><div class="bar-fill mini-fill focus" style="width:' + fpct + '%"></div></div></div>' +
+        '<div class="status-cell"><div class="status-label"><span>Morale</span><span>' + p.morale + '/10</span></div><div class="bar-track"><div class="bar-fill success" style="width:' + (p.morale*10) + '%"></div></div></div>' +
+        '<div class="status-cell"><div class="status-label"><span>Loyalty</span><span>' + loyaltyLevel(p.tenureYears) + '</span></div><div class="bar-track"><div class="bar-fill gold" style="width:' + Math.min(100, p.tenureYears/6*100) + '%"></div></div></div>' +
       '</div>';
 
     var tabNav = '<div class="tab-nav">' +
-      '<button class="shoulder-btn" id="tabPrev">◀ L</button>' +
-      '<div class="tab-bar" role="tablist" aria-label="Character sheet sections">' + TAB_ORDER.map(function (t) {
-        return '<button class="tab-btn' + (t === activeTab ? " active" : "") + '" data-tab="' + t + '" role="tab" aria-selected="' + (t === activeTab) + '">' + TAB_LABELS[t] + '</button>';
+      '<button class="btn-quiet" id="tabPrev" style="padding:6px 10px;font-size:10px;">◀</button>' +
+      '<div class="tab-bar" role="tablist" aria-label="Profile sections">' + PROFILE_TAB_ORDER.map(function (t) {
+        return '<button class="tab-btn' + (t === activeTab ? " active" : "") + '" data-tab="' + t + '" role="tab" aria-selected="' + (t === activeTab) + '">' + PROFILE_TAB_LABELS[t] + '</button>';
       }).join("") + '</div>' +
-      '<button class="shoulder-btn" id="tabNext">R ▶</button>' +
+      '<button class="btn-quiet" id="tabNext" style="padding:6px 10px;font-size:10px;">▶</button>' +
       '</div>';
 
     var body = "";
     if (activeTab === "attributes") {
-      var lowK = lowestStat(p);
-      var attrRows = STATS.map(function (k) {
-        return '<div class="attr-row"><span class="aname"' + (k === lowK ? ' style="color:var(--warning);font-weight:700;"' : '') + '>' + k + (k === lowK ? " — growth edge" : "") + '</span><span class="aval">' + p.stats[k] + '</span></div>';
+      var lowK = lowestAttr(p);
+      var attrRows = ATTRS.map(function (k) {
+        return '<div class="attr-row"><span class="aname"' + (k === lowK ? ' style="color:var(--lavender);font-weight:700;"' : '') + '>' + k + (k === lowK ? " — growth edge" : "") + '</span><span class="aval">' + p.attributes[k] + '</span></div>';
       }).join("");
-      var resRows = Object.keys(p.resistances).map(function (k) { return '<div class="attr-row"><span class="aname">' + k + '</span><span class="aval">' + p.resistances[k] + '</span></div>'; }).join("");
-      var legend = STATS.map(function (k) { return '<div class="radar-legend-item"><span>' + k + '</span><b>' + p.stats[k] + '</b></div>'; }).join("");
+      var legend = ATTRS.map(function (k) { return '<div class="radar-legend-item"><span>' + k + '</span><b>' + p.attributes[k] + '</b></div>'; }).join("");
       body = '<div class="tab-content">' +
-        '<div><div class="subpanel-title">Attributes</div><div class="attr-list">' + attrRows + '</div>' +
-          '<div class="subpanel-title" style="margin-top:14px;">Resistances</div><div class="attr-list">' + resRows + '</div></div>' +
-        '<div class="radar-wrap"><div class="subpanel-title" style="align-self:flex-start;">Stat Web</div>' + buildRadar(p.stats) +
+        '<div><div class="subpanel-title">Attributes</div><div class="attr-list">' + attrRows + '</div></div>' +
+        '<div class="radar-wrap"><div class="subpanel-title" style="align-self:flex-start;">Attribute Web</div>' + buildRadar(p.attributes) +
           '<div class="radar-legend">' + legend + '</div></div>' +
       '</div>';
-    } else if (activeTab === "loadout") {
-      var iconMap = { "Primary Focus": "ic-sword", "Secondary Focus": "ic-sword", "Core Toolkit": "ic-gear", "Certification": "ic-medal", "Support Process": "ic-shieldeq" };
-      var rows = p.loadout.map(function (l) {
-        return '<div class="loadout-row"><span class="loadout-icon">' + icon(iconMap[l.slot] || "ic-gear") + '</span>' +
-          '<span class="loadout-text"><span class="loadout-slot">' + l.slot + '</span>' +
-          '<span class="loadout-name' + (l.power === 0 ? " empty" : "") + '">' + l.name + '</span></span>' +
-          '<span class="loadout-power">' + (l.power === 0 ? "—" : l.power) + '</span></div>';
-      }).join("");
-      body = '<div class="tab-content single"><div><div class="subpanel-title">Equipped Loadout</div>' +
-        '<div class="loadout-list">' + rows + '</div>' +
-        '<div class="buffer-line"><span>Deadline Buffer</span><b>' + p.buffer + '%</b></div></div></div>';
     } else if (activeTab === "skills") {
-      var skillTiles = p.skills.map(function (s) {
-        var pips = "";
-        for (var i = 0; i < 5; i++) pips += '<span class="pip' + (i < s.lvl ? " filled" : "") + '"></span>';
-        return '<div class="skill-tile"><span class="skill-name">' + s.name + '</span><span class="pip-row">' + pips + '</span></div>';
+      var cats = Object.keys(p.skills).map(function (cat) {
+        var rows = p.skills[cat].map(function (s) {
+          var dots = "";
+          for (var i = 0; i < 5; i++) dots += '<span class="dot' + (i < s.rating ? " filled" : "") + '"></span>';
+          return '<div class="skill-row"><span class="sname">' + esc(s.name) + '</span><span class="dot-row">' + dots + '</span></div>';
+        }).join("");
+        return '<div class="skill-category"><div class="skill-cat-title">' + esc(cat) + '</div>' + rows + '</div>';
       }).join("");
+      body = '<div class="tab-content single"><div>' + cats + '</div></div>';
+    } else if (activeTab === "work") {
+      var pr = p.project;
+      body = '<div class="tab-content single"><div class="project-card">' +
+        '<div class="project-top"><span class="project-name">' + icon("ic-target") + ' ' + esc(pr.name) + '</span><span class="priority-chip ' + pr.priority + '">' + pr.priority + '</span></div>' +
+        '<div class="project-objective">' + esc(pr.objective) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill gold" style="width:' + pr.progress + '%"></div></div>' +
+        '<div class="project-meta-row"><span>Owner: <b>' + esc(p.name) + '</b></span><span>Progress: <b>' + pr.progress + '%</b></span><span>Timeline: <b>' + esc(pr.timeline) + '</b></span></div>' +
+        (pr.dependency ? '<div class="dependency-note">⚠ Dependency: ' + esc(pr.dependency) + '</div>' : '<div class="empty-note">No open dependencies.</div>') +
+        '</div></div>';
+    } else if (activeTab === "coaching") {
       var activeCoaching = p.coaching.filter(function (c) { return c.status !== "completed"; });
       var pastCoaching = p.coaching.filter(function (c) { return c.status === "completed"; });
       var coachRows = activeCoaching.length ? activeCoaching.map(function (c) {
@@ -428,58 +427,56 @@
           ? '<form class="coach-form" data-complete-form="' + c.id + '" style="margin-top:8px;">' +
               '<div class="field"><label for="outcome-' + c.id + '">Outcome — required to close this out</label>' +
               '<textarea id="outcome-' + c.id + '" required placeholder="What changed / evidence it worked"></textarea></div>' +
-              '<button type="submit" class="submit-btn">Confirm Completion</button>' +
-              ' <button type="button" class="shoulder-btn" data-cancel-complete="1">Cancel</button>' +
+              '<button type="submit" class="btn-primary">Confirm Completion</button>' +
+              ' <button type="button" class="btn-quiet" data-cancel-complete="1">Cancel</button>' +
             '</form>'
-          : '<button type="button" class="shoulder-btn" data-start-complete="' + c.id + '" style="margin-top:6px;">Mark Complete</button>';
+          : '<button type="button" class="btn-quiet" data-start-complete="' + c.id + '" style="margin-top:6px;">Mark Complete</button>';
         return '<div class="coach-item"><div class="head"><span>' + esc(c.skill) + '</span><span class="due">Due ' + esc(c.due) + '</span></div>' +
           '<div class="evidence"><strong>Target:</strong> ' + esc(c.goal) + '</div><div class="evidence"><strong>Evidence:</strong> ' + esc(c.evidence) + '</div>' +
           completeUi + '</div>';
-      }).join("") : '<div class="coach-empty">No active coaching quests.</div>';
+      }).join("") : '<div class="empty-note">No active coaching plans.</div>';
       var historyRows = pastCoaching.length ? pastCoaching.map(function (c) {
         return '<div class="coach-item" style="opacity:0.75;"><div class="head"><span>✓ ' + esc(c.skill) + '</span><span class="due">Closed ' + esc(c.due) + '</span></div>' +
           '<div class="evidence"><strong>Target:</strong> ' + esc(c.goal) + '</div><div class="evidence"><strong>Outcome:</strong> ' + esc(c.outcome) + '</div></div>';
-      }).join("") : '<div class="coach-empty">No closed coaching quests yet.</div>';
-      var statOptions = STATS.map(function (k) { return '<option value="' + k + '"' + (k === lowestStat(p) ? " selected" : "") + '>' + k + ' — ' + p.stats[k] + '</option>'; }).join("");
-      body = '<div class="tab-content"><div><div class="subpanel-title">Skill Tree</div><div class="skills-grid">' + skillTiles + '</div></div>' +
-        '<div><div class="subpanel-title">Active Coaching</div><div class="coach-list">' + coachRows + '</div>' +
-        '<div class="subpanel-title" style="margin-top:12px;">Coaching History</div><div class="coach-list">' + historyRows + '</div>' +
+      }).join("") : '<div class="empty-note">No closed coaching plans yet.</div>';
+      var lowSkill = lowestSkill(p);
+      var flat = flattenSkills(p);
+      var skillOptions = flat.map(function (s) {
+        return '<option value="' + esc(s.name) + '" data-cat="' + esc(s.category) + '"' + (lowSkill && s.name === lowSkill.name ? " selected" : "") + '>' + esc(s.name) + ' — ' + s.rating + '/5 (' + esc(s.category) + ')</option>';
+      }).join("");
+      body = '<div class="tab-content"><div><div class="subpanel-title">Active Coaching</div><div class="coach-list">' + coachRows + '</div>' +
+        '<div class="subpanel-title" style="margin-top:12px;">Coaching History</div><div class="coach-list">' + historyRows + '</div></div>' +
+        '<div><div class="subpanel-title">Assign a Coaching Plan</div>' +
         '<form class="coach-form" id="coachForm">' +
-          '<div class="field"><label for="skillSel">Skill focus</label><select id="skillSel">' + statOptions + '</select></div>' +
+          '<div class="field"><label for="skillSel">Skill focus</label><select id="skillSel">' + skillOptions + '</select></div>' +
           '<div class="field"><label for="goalInput">Coaching target</label><input id="goalInput" type="text" placeholder="e.g. Flag blockers within 48 hours" required /></div>' +
           '<div class="field"><label for="evInput">Evidence</label><textarea id="evInput" placeholder="What you observed that prompted this" required></textarea></div>' +
           '<div class="field"><label for="dueInput">Check back by</label><input id="dueInput" type="text" placeholder="e.g. Aug 12" required /></div>' +
-          '<button type="submit" class="submit-btn">Assign Coaching Quest</button>' +
+          '<button type="submit" class="btn-primary">Assign Coaching Plan</button>' +
         '</form></div></div>';
-    } else if (activeTab === "roles") {
-      var reports = p.roles.directReports.length ? p.roles.directReports.map(function (d) { return '<span class="plain-chip">' + d + '</span>'; }).join("") : '<span class="plain-chip">No direct reports</span>';
+    } else if (activeTab === "record") {
+      var reports = p.directReports.length ? p.directReports.map(function (d) { return '<span class="plain-chip">' + esc(d) + '</span>'; }).join("") : '<span class="plain-chip">No direct reports</span>';
       var leaveRow = p.leave.upcoming
         ? '<div class="kv-row"><span class="k">Upcoming leave</span><span class="v">' + p.leave.upcoming.start + '–' + p.leave.upcoming.end + '</span></div>'
         : '<div class="kv-row"><span class="k">Upcoming leave</span><span class="v">None scheduled</span></div>';
       var infractionRows = p.infractions.length
         ? p.infractions.map(function (inf) {
-            return '<div class="list-row"><span class="stripe ' + (inf.severity === "low" ? "warning" : "critical") + '"></span>' +
+            return '<div class="list-row"><span class="stripe ' + (inf.severity === "low" ? "warning" : "danger") + '"></span>' +
               '<span class="body"><span class="title">' + inf.date + '</span><span class="sub">' + inf.note + '</span></span></div>';
           }).join("")
-        : '<div class="coach-empty">No infractions on record.</div>';
+        : '<div class="empty-note">No infractions on record.</div>';
       body = '<div class="tab-content"><div>' +
-        '<div class="subpanel-title">Role Sheet</div>' +
-        '<div class="roles-kv">' +
-        '<div class="kv-row"><span class="k">Reports to</span><span class="v">' + p.roles.reportsTo + '</span></div>' +
-        '<div class="kv-row"><span class="k">Tenure</span><span class="v">' + p.roles.tenure + '</span></div>' +
-        '<div class="kv-row"><span class="k">Morale (LP)</span><span class="v">' + p.morale + ' / 10</span></div>' +
+        '<div class="subpanel-title">Role Record</div>' +
+        '<div class="record-kv">' +
+        '<div class="kv-row"><span class="k">Reports to</span><span class="v">' + esc(p.reportsTo) + '</span></div>' +
+        '<div class="kv-row"><span class="k">Tenure</span><span class="v">' + esc(p.tenure) + '</span></div>' +
         '<div class="kv-row"><span class="k">Next check-in</span><span class="v">' + p.nextCheckin.date + ' · ' + p.nextCheckin.type + '</span></div>' +
         '</div>' +
         '<div class="subpanel-title" style="margin-top:12px;">Direct Reports</div><div class="chip-list">' + reports + '</div>' +
-        '<div class="subpanel-title" style="margin-top:12px;">Active Quest</div>' +
-        '<div class="loadout-row" style="border-bottom:none;"><span class="loadout-icon">' + icon("ic-target") + '</span>' +
-        '<span class="loadout-text"><span class="loadout-name">' + p.quest.title + '</span></span></div>' +
-        '<div class="bar-track"><div class="bar-fill mini-fill sp" style="width:' + p.quest.progress + '%"></div></div>' +
-        (p.struggle ? '<div class="detail-flavor" style="color:var(--warning);margin-top:8px;">⚠ ' + p.struggle + '</div>' : '') +
         '</div>' +
         '<div>' +
         '<div class="subpanel-title">Leave</div>' +
-        '<div class="roles-kv">' +
+        '<div class="record-kv">' +
         '<div class="kv-row"><span class="k">Balance</span><span class="v">' + p.leave.balance + ' days</span></div>' +
         '<div class="kv-row"><span class="k">Taken YTD</span><span class="v">' + p.leave.takenYTD + ' days</span></div>' +
         leaveRow +
@@ -487,38 +484,39 @@
         '<div class="subpanel-title" style="margin-top:12px;">Infractions</div>' +
         '<div class="list-rows">' + infractionRows + '</div>' +
         '</div></div>' +
-        renderPersonalRecordSection(p);
+        renderSealedRecord(p);
     }
 
-    document.getElementById("detailPanel").innerHTML = header + tabNav + body;
+    document.getElementById("profilePanel").innerHTML = header + tabNav + body;
 
     document.getElementById("tabPrev").addEventListener("click", function () { cycleTab(-1); });
     document.getElementById("tabNext").addEventListener("click", function () { cycleTab(1); });
     Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"), function (btn) {
-      btn.addEventListener("click", function () { activeTab = btn.getAttribute("data-tab"); renderDetail(); });
+      btn.addEventListener("click", function () { activeTab = btn.getAttribute("data-tab"); renderProfile(); });
     });
 
     var form = document.getElementById("coachForm");
     if (form) {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var skill = document.getElementById("skillSel").value;
+        var sel = document.getElementById("skillSel");
+        var skill = sel.value;
+        var category = sel.options[sel.selectedIndex].getAttribute("data-cat");
         var goal = document.getElementById("goalInput").value.trim();
         var ev = document.getElementById("evInput").value.trim();
         var due = document.getElementById("dueInput").value.trim();
         if (!goal || !ev || !due) return;
-        p.coaching.unshift({ id: nextCoachingId++, skill: skill, goal: goal, evidence: ev, due: due, status: "active" });
-        renderDetail();
-        renderPeopleKPIs();
+        p.coaching.unshift({ id: nextCoachingId++, skill: skill, category: category, goal: goal, evidence: ev, due: due, status: "active" });
+        renderProfile();
+        renderOverview();
       });
     }
 
-    // --- Feature B: Mark Complete wiring ---
     Array.prototype.forEach.call(document.querySelectorAll("[data-start-complete]"), function (btn) {
-      btn.addEventListener("click", function () { completingQuestId = Number(btn.getAttribute("data-start-complete")); renderDetail(); });
+      btn.addEventListener("click", function () { completingQuestId = Number(btn.getAttribute("data-start-complete")); renderProfile(); });
     });
     var cancelBtn = document.querySelector("[data-cancel-complete]");
-    if (cancelBtn) cancelBtn.addEventListener("click", function () { completingQuestId = null; renderDetail(); });
+    if (cancelBtn) cancelBtn.addEventListener("click", function () { completingQuestId = null; renderProfile(); });
     Array.prototype.forEach.call(document.querySelectorAll("[data-complete-form]"), function (f) {
       f.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -531,14 +529,13 @@
         quest.completedAt = new Date().toISOString();
         quest.outcome = outcome;
         completingQuestId = null;
-        renderDetail();
-        renderPeopleKPIs();
+        renderProfile();
+        renderOverview();
       });
     });
 
-    // --- Feature C: Personal Record wiring ---
     Array.prototype.forEach.call(document.querySelectorAll("[data-reveal]"), function (btn) {
-      btn.addEventListener("click", function () { personalRecordRevealed[btn.getAttribute("data-reveal")] = true; renderDetail(); });
+      btn.addEventListener("click", function () { personalRecordRevealed[btn.getAttribute("data-reveal")] = true; renderProfile(); });
     });
     var prForm = document.getElementById("personalRecordForm");
     if (prForm) {
@@ -557,38 +554,128 @@
           mbti: document.getElementById("prMbti").value.trim(),
           savedAt: Date.now()
         };
-        renderDetail();
+        renderProfile();
       });
     }
   }
 
   document.addEventListener("click", function (e) {
     var sel = e.target.closest("[data-select]");
-    if (sel) { selectedId = sel.getAttribute("data-select"); activeTab = "attributes"; completingQuestId = null; renderRail(); renderDetail(); }
+    if (sel) { selectedId = sel.getAttribute("data-select"); activeTab = "attributes"; completingQuestId = null; renderRoster(); renderProfile(); }
   });
 
-  /* ---------- Mode switch ---------- */
-  document.getElementById("tabPartyBtn").addEventListener("click", function () { setMode("party"); });
-  document.getElementById("tabOpsBtn").addEventListener("click", function () { setMode("ops"); });
-  function setMode(mode) {
-    var isParty = mode === "party";
-    document.getElementById("partyView").hidden = !isParty;
-    document.getElementById("opsView").hidden = isParty;
-    document.getElementById("tabPartyBtn").classList.toggle("active", isParty);
-    document.getElementById("tabPartyBtn").setAttribute("aria-selected", String(isParty));
-    document.getElementById("tabOpsBtn").classList.toggle("active", !isParty);
-    document.getElementById("tabOpsBtn").setAttribute("aria-selected", String(!isParty));
-    document.body.classList.toggle("ops-active", !isParty);
+  /* ================= OVERVIEW ================= */
+  function renderOverview() {
+    var activeCoaching = people.reduce(function (n, p) { return n + p.coaching.filter(function (c) { return c.status !== "completed"; }).length; }, 0);
+    var openInfractions = people.reduce(function (n, p) { return n + p.infractions.length; }, 0);
+    var needsAttention = people.filter(function (p) { return riskLevel(p) !== "Low"; }).length;
+    var kpis = [
+      { label: "Headcount", value: String(people.length), delta: "stable", tone: "flat" },
+      { label: "Needs Attention", value: String(needsAttention), delta: needsAttention > 3 ? "elevated" : "normal", tone: needsAttention > 3 ? "warning" : "good" },
+      { label: "Coaching Active", value: String(activeCoaching), delta: "tracked", tone: "good" },
+      { label: "Open Infractions", value: String(openInfractions), delta: openInfractions > 0 ? "review" : "clean", tone: openInfractions > 0 ? "warning" : "good" }
+    ];
+    document.getElementById("ovKpiRow").innerHTML = kpis.map(function (k) {
+      return '<div class="kpi-tile"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+    }).join("");
+
+    renderRecognitionInto("ovRecognition");
+    renderCoachingPriorityInto("ovCoachingPriority");
+
+    var attn = people.filter(function (p) { return riskLevel(p) !== "Low"; });
+    document.getElementById("ovAttentionList").innerHTML = attn.length ? attn.map(function (p) {
+      var risk = riskLevel(p);
+      return '<div class="list-row"><span class="stripe ' + (risk === "High" ? "danger" : "warning") + '"></span>' +
+        '<span class="body"><span class="title">' + esc(p.name) + '</span><span class="sub">' + esc(p.title) + (p.blocker ? " — " + esc(p.blocker) : "") + '</span></span>' +
+        '<span class="tag ' + (risk === "High" ? "danger" : "warning") + '">' + risk + '</span></div>';
+    }).join("") : '<div class="empty-note">Nobody flagged right now.</div>';
+
+    document.getElementById("ovAlertsList").innerHTML = complianceItems.map(function (c) {
+      return '<div class="list-row"><span class="stripe ' + c.sev + '"></span><span class="body"><span class="title">' + c.title + '</span><span class="sub">' + c.sub + '</span></span><span class="tag ' + c.sev + '">' + c.tag + '</span></div>';
+    }).join("");
+
+    var last = plMonths[plMonths.length - 1];
+    document.getElementById("ovQuickIntel").innerHTML =
+      '<div class="kv-row"><span class="k">Team at risk</span><span class="v">' + needsAttention + ' of ' + people.length + '</span></div>' +
+      '<div class="kv-row"><span class="k">Active missions</span><span class="v">' + people.length + '</span></div>' +
+      '<div class="kv-row"><span class="k">MRR</span><span class="v">$' + last.rev + 'K</span></div>' +
+      '<div class="kv-row"><span class="k">Cash runway</span><span class="v">14 mo</span></div>';
+
+    document.getElementById("ovNotifCount").textContent = notifications.length + " recent";
+    document.getElementById("ovNotifications").innerHTML = notifications.map(function (nf) {
+      return '<div class="list-row"><span class="stripe ' + nf.sev + '"></span><span class="body"><span class="title">' + nf.title + '</span><span class="sub">' + nf.body + '</span></span></div>';
+    }).join("");
   }
 
-  /* ================= OPS DATA + RENDER ================= */
+  /* ================= WORK ================= */
+  var PRIORITY_WEIGHT = { High: 3, Medium: 2, Low: 1 };
+  function renderWork() {
+    var high = people.filter(function (p) { return p.project.priority === "High"; }).length;
+    var avgProgress = Math.round(people.reduce(function (s, p) { return s + p.project.progress; }, 0) / people.length);
+    var kpis = [
+      { label: "Active Missions", value: String(people.length), tone: "flat", delta: "org-wide" },
+      { label: "High Priority", value: String(high), tone: high > 2 ? "warning" : "good", delta: high > 2 ? "elevated" : "normal" },
+      { label: "Avg. Progress", value: avgProgress + "%", tone: "good", delta: "tracked" },
+      { label: "Open Compliance Flags", value: String(complianceItems.filter(function (c) { return c.sev !== "good"; }).length), tone: "warning", delta: "review" }
+    ];
+    document.getElementById("workKpiRow").innerHTML = kpis.map(function (k) {
+      return '<div class="kpi-tile"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+    }).join("");
+
+    var sorted = people.slice().sort(function (a, b) { return PRIORITY_WEIGHT[b.project.priority] - PRIORITY_WEIGHT[a.project.priority]; });
+    document.getElementById("workProjectList").innerHTML = sorted.map(function (p) {
+      var pr = p.project;
+      return '<div class="project-card" style="border-top:1px solid var(--border-neutral);padding-top:12px;">' +
+        '<div class="project-top"><span class="project-name">' + icon("ic-target") + ' ' + esc(pr.name) + '</span><span class="priority-chip ' + pr.priority + '">' + pr.priority + '</span></div>' +
+        '<div class="project-objective">' + esc(pr.objective) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill gold" style="width:' + pr.progress + '%"></div></div>' +
+        '<div class="project-meta-row"><span>Owner: <b>' + esc(p.name) + '</b></span><span>Progress: <b>' + pr.progress + '%</b></span><span>Timeline: <b>' + esc(pr.timeline) + '</b></span></div>' +
+        (pr.dependency ? '<div class="dependency-note">⚠ Dependency: ' + esc(pr.dependency) + '</div>' : '') +
+        '</div>';
+    }).join("");
+
+    var sortedActivity = activityFeed.slice().sort(function (a, b) { return parseCheckinDate(a.date) - parseCheckinDate(b.date); });
+    var typeMeta = { meeting: { sev: "warning", tag: "Meeting" }, work: { sev: "good", tag: "Work" } };
+    document.getElementById("workActivity").innerHTML = sortedActivity.map(function (a) {
+      var m = typeMeta[a.type];
+      return '<div class="list-row"><span class="stripe ' + m.sev + '"></span><span class="body"><span class="title">' + a.title + '</span><span class="sub">' + a.date + ' · ' + a.sub + '</span></span><span class="tag ' + m.sev + '">' + m.tag + '</span></div>';
+    }).join("");
+
+    document.getElementById("workComplianceHint").textContent = complianceItems.length + " tracked";
+    document.getElementById("workCompliance").innerHTML = complianceItems.map(function (c) {
+      return '<div class="list-row"><span class="stripe ' + c.sev + '"></span><span class="body"><span class="title">' + c.title + '</span><span class="sub">' + c.sub + '</span></span><span class="tag ' + c.sev + '">' + c.tag + '</span></div>';
+    }).join("");
+  }
+
+  /* ================= COACHING (org-wide) ================= */
+  function renderCoaching() {
+    renderRecognitionInto("coachRecognition");
+    renderCoachingPriorityInto("coachPriority");
+
+    var allActive = [], allHistory = [];
+    people.forEach(function (p) {
+      p.coaching.forEach(function (c) {
+        var row = { p: p, c: c };
+        if (c.status === "completed") allHistory.push(row); else allActive.push(row);
+      });
+    });
+
+    document.getElementById("coachActiveHint").textContent = allActive.length + " open";
+    document.getElementById("coachActiveList").innerHTML = allActive.length ? allActive.map(function (r) {
+      return '<div class="coach-item"><div class="head"><span>' + esc(r.p.name) + ' — ' + esc(r.c.skill) + '</span><span class="due">Due ' + esc(r.c.due) + '</span></div>' +
+        '<div class="evidence"><strong>Target:</strong> ' + esc(r.c.goal) + '</div><div class="evidence"><strong>Evidence:</strong> ' + esc(r.c.evidence) + '</div></div>';
+    }).join("") : '<div class="empty-note">No active coaching plans anywhere in the org right now.</div>';
+
+    document.getElementById("coachHistoryList").innerHTML = allHistory.length ? allHistory.map(function (r) {
+      return '<div class="coach-item" style="opacity:0.8;"><div class="head"><span>✓ ' + esc(r.p.name) + ' — ' + esc(r.c.skill) + '</span><span class="due">Closed ' + esc(r.c.due) + '</span></div>' +
+        '<div class="evidence"><strong>Outcome:</strong> ' + esc(r.c.outcome) + '</div></div>';
+    }).join("") : '<div class="empty-note">Nothing closed out yet.</div>';
+  }
+
+  /* ================= FINANCE DATA + RENDER ================= */
   var plMonths = [
-    { m: "Feb", rev: 195, exp: 210 },
-    { m: "Mar", rev: 205, exp: 215 },
-    { m: "Apr", rev: 215, exp: 218 },
-    { m: "May", rev: 230, exp: 224 },
-    { m: "Jun", rev: 248, exp: 230 },
-    { m: "Jul", rev: 260, exp: 232 }
+    { m: "Feb", rev: 195, exp: 210 }, { m: "Mar", rev: 205, exp: 215 }, { m: "Apr", rev: 215, exp: 218 },
+    { m: "May", rev: 230, exp: 224 }, { m: "Jun", rev: 248, exp: 230 }, { m: "Jul", rev: 260, exp: 232 }
   ];
   var subscriptions = [
     { tool: "AWS", category: "Infrastructure", monthly: 8.4, renews: "Monthly" },
@@ -613,30 +700,23 @@
     { name: "Legal & Compliance", value: 15 },
     { name: "Ops & Logistics", value: 13 }
   ];
-
   var activityFeed = [
     { type: "meeting", date: "Jul 30", title: "1:1 — Mara Okoye", sub: "Capacity check-in, socket migration status" },
-    { type: "meeting", date: "Jul 30", title: "1:1 — Aisha Bello", sub: "Onboarding template refresh sync" },
+    { type: "meeting", date: "Jul 30", title: "1:1 — Aisha Bello", sub: "Onboarding refresh sync" },
     { type: "meeting", date: "Jul 31", title: "Blocker review — Devon Cross", sub: "Socket-service repo access escalation" },
     { type: "work", date: "Jul 28", title: "NDA backlog: 3 cleared", sub: "Elin Kask — queue down to 31" },
-    { type: "work", date: "Jul 26", title: "Creator kit assets delivered", sub: "Jonah Reyes — Loot Drop launch campaign" },
+    { type: "work", date: "Jul 26", title: "Creator kit assets delivered", sub: "Jonah Reyes — launch campaign" },
     { type: "meeting", date: "Aug 1", title: "1:1 — Sana Rocha", sub: "Vendor renewal backlog" },
     { type: "work", date: "Jul 24", title: "Q3 HR audit pass complete", sub: "Renata Silva — compliance sweep, 1 of 3 legs done" },
     { type: "meeting", date: "Aug 3", title: "Finance snapshot — Tomas Varga", sub: "Q4 runway model review" },
-    { type: "work", date: "Jul 23", title: "Loot Drop socket migration — staging deploy", sub: "Mara Okoye — pending Devon's audit sign-off" },
-    { type: "meeting", date: "Aug 4", title: "Goal review — Priya Anand", sub: "Loot Drop v2 reward-type spec" }
+    { type: "work", date: "Jul 23", title: "Socket migration — staging deploy", sub: "Mara Okoye — pending Devon's audit sign-off" },
+    { type: "meeting", date: "Aug 4", title: "Goal review — Priya Anand", sub: "Reward-type expansion spec" }
   ];
   var complianceItems = [
-    { title: "Winner-selection logic discrepancy (Loot Drop)", sub: "Owner: Devon Cross · claim-order vs. secure random draw", sev: "critical", tag: "Open" },
-    { title: "NDA backlog", sub: "Owner: Elin Kask · 31 open, no paralegal support", sev: "critical", tag: "Open" },
+    { title: "Winner-selection logic discrepancy (Loot Drop)", sub: "Owner: Devon Cross · claim-order vs. secure random draw", sev: "danger", tag: "Open" },
+    { title: "NDA backlog", sub: "Owner: Elin Kask · 31 open, no paralegal support", sev: "danger", tag: "Open" },
     { title: "Q3 compliance sweep — HR / Finance / Legal", sub: "Owner: Renata Silva · in progress", sev: "warning", tag: "44%" },
     { title: "SOC 2 Type II renewal", sub: "Owner: Renata Silva · evidence window opens Aug 10", sev: "good", tag: "On track" }
-  ];
-  var approvals = [
-    { title: "PTO request — Sana Rocha", sub: "Aug 4–8", sev: "warning", tag: "Pending" },
-    { title: "Expense report — Jonah Reyes", sub: "$2,340 · campaign spend", sev: "warning", tag: "Pending" },
-    { title: "NDA countersignature — Elin Kask", sub: "Partnership agreement", sev: "critical", tag: "Pending" },
-    { title: "Payroll adjustment — Tomas Varga", sub: "Q3 bonus accrual correction", sev: "warning", tag: "Pending" }
   ];
   var docs = [
     { title: "Vendor MSA — CloudHost Inc.", sub: "Renews Aug 15", sev: "warning", tag: "16d" },
@@ -644,138 +724,152 @@
     { title: "Streamer Partnership Agreement — Creator Guild", sub: "Renews Aug 20", sev: "good", tag: "21d" },
     { title: "D&O Insurance Policy", sub: "Renews Oct 3", sev: "good", tag: "65d" }
   ];
+  var notifications = [
+    { title: "Recognition Added", body: "Jonah Reyes recognized for leadership.", sev: "good" },
+    { title: "Coaching Updated", body: "Adaptability coaching assigned.", sev: "info" },
+    { title: "Performance Alert", body: "Capacity exceeded for three consecutive weeks.", sev: "danger" },
+    { title: "Compliance Review", body: "One infraction requires attention.", sev: "warning" }
+  ];
 
-  function renderOpsKPIs() {
+  function renderFinance() {
     var last = plMonths[plMonths.length - 1], prev = plMonths[plMonths.length - 2];
     var netLast = last.rev - last.exp, netPrev = prev.rev - prev.exp;
+    var burn = Math.max(0, last.exp - last.rev);
     var kpis = [
-      { label: "MRR", value: "$" + last.rev + "K", delta: "+" + Math.round((last.rev-prev.rev)/prev.rev*100) + "% MoM", tone: "good" },
-      { label: "Net (Rev − Exp)", value: (netLast >= 0 ? "+$" : "−$") + Math.abs(netLast) + "K", delta: netLast > netPrev ? "widening" : "narrowing", tone: netLast >= 0 ? "good" : "warning" },
-      { label: "Cash Runway", value: "14 mo", delta: "flat", tone: "flat" },
-      { label: "Open Compliance Flags", value: String(complianceItems.filter(function(c){return c.sev!=="good";}).length), delta: "review", tone: "warning" }
+      { label: "MRR", value: "$" + last.rev + "K", tone: "good", delta: "+" + Math.round((last.rev-prev.rev)/prev.rev*100) + "% MoM" },
+      { label: "Net Income", value: (netLast >= 0 ? "+$" : "−$") + Math.abs(netLast) + "K", tone: netLast >= 0 ? "good" : "warning", delta: netLast > netPrev ? "widening" : "narrowing" },
+      { label: "Burn Rate", value: burn === 0 ? "Profitable" : "$" + burn + "K/mo", tone: burn === 0 ? "good" : "warning", delta: burn === 0 ? "at breakeven" : "monitor" },
+      { label: "Cash Runway", value: "14 mo", tone: "flat", delta: "flat" }
     ];
-    document.getElementById("opsKpiRow").innerHTML = kpis.map(function (k) {
-      return '<div class="kpi"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
+    document.getElementById("financeKpiRow").innerHTML = kpis.map(function (k) {
+      return '<div class="kpi-tile"><div class="label">' + k.label + '</div><div class="value-row"><span class="value">' + k.value + '</span><span class="delta ' + k.tone + '">' + k.delta + '</span></div></div>';
     }).join("");
-  }
 
-  function renderPLChart() {
     var w = 560, h = 200, padL = 30, padB = 24, padT = 10;
     var max = Math.max.apply(null, plMonths.map(function (d) { return Math.max(d.rev, d.exp); }));
     var scale = (h - padT - padB) / (max * 1.1);
-    var groupW = (w - padL) / plMonths.length;
-    var barW = 16;
+    var groupW = (w - padL) / plMonths.length, barW = 16;
     var bars = plMonths.map(function (d, i) {
       var gx = padL + i * groupW + groupW / 2;
       var revH = d.rev * scale, expH = d.exp * scale;
       var x1 = gx - barW - 2, x2 = gx + 2;
       var y1 = h - padB - revH, y2 = h - padB - expH;
       return '<g>' +
-        '<rect x="' + x1 + '" y="' + y1 + '" width="' + barW + '" height="' + revH + '" rx="3" fill="var(--accent)"><title>' + d.m + ' Revenue: $' + d.rev + 'K</title></rect>' +
-        '<rect x="' + x2 + '" y="' + y2 + '" width="' + barW + '" height="' + expH + '" rx="3" fill="#5c7ea3"><title>' + d.m + ' Expenses: $' + d.exp + 'K</title></rect>' +
+        '<rect x="' + x1 + '" y="' + y1 + '" width="' + barW + '" height="' + revH + '" rx="3" fill="var(--gold)"><title>' + d.m + ' Revenue: $' + d.rev + 'K</title></rect>' +
+        '<rect x="' + x2 + '" y="' + y2 + '" width="' + barW + '" height="' + expH + '" rx="3" fill="var(--cyan)"><title>' + d.m + ' Expenses: $' + d.exp + 'K</title></rect>' +
         '<text x="' + gx + '" y="' + (h - 6) + '" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="var(--font-data)">' + d.m + '</text>' +
         '</g>';
     }).join("");
-    var baseline = '<line x1="' + padL + '" y1="' + (h - padB) + '" x2="' + w + '" y2="' + (h - padB) + '" stroke="var(--border)" stroke-width="1"/>';
-    document.getElementById("plChart").innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" style="min-width:480px;">' + baseline + bars + '</svg>';
-  }
+    var baseline = '<line x1="' + padL + '" y1="' + (h - padB) + '" x2="' + w + '" y2="' + (h - padB) + '" stroke="var(--border-neutral)" stroke-width="1"/>';
+    document.getElementById("financeChart").innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" style="min-width:480px;">' + baseline + bars + '</svg>';
 
-  function renderExpenseBars() {
     var total = expenseCats.reduce(function (s, c) { return s + c.value; }, 0);
-    document.getElementById("expenseTotalHint").textContent = "$" + total + "K total";
-    var max = Math.max.apply(null, expenseCats.map(function (c) { return c.value; }));
+    document.getElementById("financeExpenseHint").textContent = "$" + total + "K total";
+    var maxCat = Math.max.apply(null, expenseCats.map(function (c) { return c.value; }));
     var sortedCats = expenseCats.slice().sort(function (a, b) { return b.value - a.value; });
-    document.getElementById("expenseBars").innerHTML = sortedCats.map(function (c, i) {
-      var pct = Math.round(c.value / max * 100);
-      var lightness = 78 - i * 10;
+    document.getElementById("financeExpenseBars").innerHTML = sortedCats.map(function (c, i) {
+      var pct = Math.round(c.value / maxCat * 100);
+      var lightness = 72 - i * 9;
       return '<div class="seq-row"><div class="seq-label-row"><span class="n">' + c.name + '</span><span class="v">$' + c.value + 'K</span></div>' +
-        '<div class="seq-track"><div class="seq-fill" style="width:' + pct + '%;background:hsl(42,60%,' + lightness + '%)"></div></div></div>';
+        '<div class="seq-track"><div class="seq-fill" style="width:' + pct + '%;background:hsl(38,70%,' + lightness + '%)"></div></div></div>';
     }).join("");
-  }
 
-  function renderSubscriptions() {
-    var total = subscriptions.reduce(function (s, x) { return s + x.monthly; }, 0);
-    document.getElementById("subsTotalHint").textContent = "$" + total.toFixed(1) + "K/mo · " + subscriptions.length + " tools";
-    var sorted = subscriptions.slice().sort(function (a, b) { return b.monthly - a.monthly; });
-    document.getElementById("subsList").innerHTML = sorted.map(function (s) {
+    var subsTotal = subscriptions.reduce(function (s, x) { return s + x.monthly; }, 0);
+    document.getElementById("financeSubsHint").textContent = "$" + subsTotal.toFixed(1) + "K/mo · " + subscriptions.length + " tools";
+    var sortedSubs = subscriptions.slice().sort(function (a, b) { return b.monthly - a.monthly; });
+    document.getElementById("financeSubsList").innerHTML = sortedSubs.map(function (s) {
       return '<div class="list-row"><span class="stripe good"></span><span class="body"><span class="title">' + s.tool + '</span><span class="sub">' + s.category + ' · renews ' + s.renews + '</span></span>' +
         '<span class="tag good">$' + s.monthly.toFixed(2) + 'K</span></div>';
     }).join("");
   }
 
-  function renderActivityFeed() {
-    var typeMeta = { meeting: { sev: "warning", tag: "Meeting" }, work: { sev: "good", tag: "Work" } };
-    var sorted = activityFeed.slice().sort(function (a, b) { return parseCheckinDate(a.date) - parseCheckinDate(b.date); });
-    document.getElementById("activityFeed").innerHTML = sorted.map(function (a) {
-      var m = typeMeta[a.type];
-      return '<div class="list-row"><span class="stripe ' + m.sev + '"></span><span class="body"><span class="title">' + a.title + '</span><span class="sub">' + a.date + ' · ' + a.sub + '</span></span><span class="tag ' + m.sev + '">' + m.tag + '</span></div>';
-    }).join("");
-  }
-
-  function renderListPanel(elId, items) {
-    document.getElementById(elId).innerHTML = items.map(function (it) {
-      return '<div class="list-row"><span class="stripe ' + it.sev + '"></span><span class="body"><span class="title">' + it.title + '</span><span class="sub">' + it.sub + '</span></span><span class="tag ' + it.sev + '">' + it.tag + '</span></div>';
-    }).join("");
-  }
-
-  function renderGoals() {
-    var goals = people.map(function (p) { return { title: p.quest.title, owner: p.name, progress: p.quest.progress }; })
-      .sort(function (a, b) { return a.progress - b.progress; }).slice(0, 5);
-    document.getElementById("goalList").innerHTML = goals.map(function (g) {
-      return '<div class="goal-row"><div class="goal-top"><span>' + g.title + '</span><span class="owner">' + g.progress + '%</span></div>' +
-        '<div class="owner">' + g.owner + '</div>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:' + g.progress + '%;height:100%;border-radius:4px;background:var(--accent);"></div></div></div>';
-    }).join("");
-  }
-
-  function renderReportTiles() {
-    var attendance = "96%", turnover = "4.2%", skillGaps = people.reduce(function (n, p) { return n + Object.values(p.stats).filter(function (v) { return v < 60; }).length; }, 0);
+  /* ================= REPORTS ================= */
+  function renderReports() {
+    var skillGaps = people.reduce(function (n, p) { return n + Object.values(p.attributes).filter(function (v) { return v < 60; }).length; }, 0);
     var payrollCat = expenseCats.filter(function (c) { return c.name === "Payroll"; })[0];
-    var payroll = "$" + payrollCat.value + "K";
     var tiles = [
-      { label: "Attendance (30d)", value: attendance },
-      { label: "Turnover (TTM)", value: turnover },
+      { label: "Attendance (30d)", value: "96%" },
+      { label: "Turnover (TTM)", value: "4.2%" },
       { label: "Skill Gaps Flagged", value: String(skillGaps) },
-      { label: "Payroll (Jul)", value: payroll }
+      { label: "Payroll (Jul)", value: "$" + payrollCat.value + "K" }
     ];
-    document.getElementById("reportTiles").innerHTML = tiles.map(function (t) {
-      return '<div class="report-tile"><span class="rt-label">' + t.label + '</span><span class="rt-value">' + t.value + '</span></div>';
+    document.getElementById("reportsTiles").innerHTML = tiles.map(function (t) {
+      return '<div class="kpi-tile"><div class="label">' + t.label + '</div><div class="value-row"><span class="value">' + t.value + '</span></div></div>';
     }).join("");
-  }
 
-  function renderOrgMini() {
-    // Derived live from each person's roles.reportsTo/orgLabel so this chart can never drift from the roster data.
     var branches = ["CTO", "COO"];
     var cols = branches.map(function (branch) {
-      var directs = people.filter(function (p) { return p.roles.reportsTo === branch; });
-      var leaves = directs.map(function (p) {
-        return '<span class="org-leaf">' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.roles.orgLabel) + '</span>';
-      }).join("");
+      var directs = people.filter(function (p) { return p.reportsTo === branch; });
+      var leaves = directs.map(function (p) { return '<span class="org-leaf">' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.orgLabel) + '</span>'; }).join("");
       var subLeaves = directs.map(function (lead) {
-        return people.filter(function (p) { return p.roles.reportsTo === lead.name; }).map(function (p) {
-          return '<span class="org-leaf sub">↳ ' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.roles.orgLabel) + '</span>';
+        return people.filter(function (p) { return p.reportsTo === lead.name; }).map(function (p) {
+          return '<span class="org-leaf sub">↳ ' + esc(p.name.split(" ")[0]) + ' — ' + esc(p.orgLabel) + '</span>';
         }).join("");
       }).join("");
       return '<div class="org-col"><div class="org-node">' + branch + '</div><div class="org-leaf-group">' + leaves + subLeaves + '</div></div>';
     }).join("");
-    document.getElementById("orgMini").innerHTML = '<div class="org-node">CEO</div><div class="org-branches">' + cols + '</div>';
+    document.getElementById("reportsOrgMini").innerHTML = '<div class="org-node">CEO</div><div class="org-branches">' + cols + '</div>';
+
+    var goals = people.map(function (p) { return { title: p.project.name, owner: p.name, progress: p.project.progress }; })
+      .sort(function (a, b) { return a.progress - b.progress; }).slice(0, 5);
+    document.getElementById("reportsGoals").innerHTML = goals.map(function (g) {
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--border-neutral);"><div style="display:flex;justify-content:space-between;font-size:12.5px;"><span>' + esc(g.title) + '</span><span style="color:var(--text-muted);font-size:11px;">' + g.progress + '%</span></div>' +
+        '<div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">' + esc(g.owner) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill gold" style="width:' + g.progress + '%"></div></div></div>';
+    }).join("");
+
+    document.getElementById("reportsDocs").innerHTML = docs.map(function (d) {
+      return '<div class="list-row"><span class="stripe ' + d.sev + '"></span><span class="body"><span class="title">' + d.title + '</span><span class="sub">' + d.sub + '</span></span><span class="tag ' + d.sev + '">' + d.tag + '</span></div>';
+    }).join("");
   }
 
-  renderOpsKPIs();
-  renderPLChart();
-  renderExpenseBars();
-  renderSubscriptions();
-  renderActivityFeed();
-  document.getElementById("complianceCountHint").textContent = complianceItems.length + " tracked";
-  renderListPanel("complianceList", complianceItems);
-  renderListPanel("approvalList", approvals);
-  renderGoals();
-  renderListPanel("docList", docs);
-  renderReportTiles();
-  renderOrgMini();
+  /* ================= CODEX ================= */
+  function renderCodex() {
+    var statusDefs = [
+      { term: "Capacity", def: "Workload availability right now — how much room someone has before they're overcommitted." },
+      { term: "Focus", def: "Current mental bandwidth. Low focus alongside high capacity usually means context-switching, not laziness." },
+      { term: "Morale", def: "Engagement, derived from Resilience trends. A leading indicator, not a performance score." },
+      { term: "Risk", def: "Retention or performance concern, computed from an active blocker plus low capacity. Not a judgment — a prompt to check in." },
+      { term: "Loyalty", def: "Long-term organizational health, informed by tenure. 'Building' isn't a negative — it just means the relationship is newer." }
+    ];
+    document.getElementById("codexStatus").innerHTML = statusDefs.map(function (d) {
+      return '<div class="codex-entry"><div class="codex-term">' + d.term + '</div><div class="codex-def">' + d.def + '</div></div>';
+    }).join("");
 
-  renderPeopleKPIs();
-  renderSpotlight();
-  renderRail();
-  renderDetail();
+    var attrDefs = [
+      { term: "Execution", def: "Gets committed work done, reliably and on time." },
+      { term: "Craft", def: "Depth and quality of the work itself." },
+      { term: "Communication", def: "Clarity with others — up, down, and across teams." },
+      { term: "Strategy", def: "Sees the bigger picture and sequences work toward it." },
+      { term: "Adaptability", def: "Handles ambiguity and change without losing footing." },
+      { term: "Resilience", def: "Recovers from setbacks and sustains performance under pressure." }
+    ];
+    document.getElementById("codexAttributes").innerHTML = attrDefs.map(function (d) {
+      return '<div class="codex-entry"><div class="codex-term">' + d.term + '</div><div class="codex-def">' + d.def + '</div></div>';
+    }).join("");
+
+    var skillCats = ["Technical Execution", "Strategic Thinking", "Leadership", "Communication", "Craft & Domain"];
+    var skillDefs = {
+      "Technical Execution": "Hands-on delivery skills specific to a discipline — system design, incident response, and the like.",
+      "Strategic Thinking": "Prioritization, forecasting, and policy-level judgment.",
+      "Leadership": "Coordinating, mentoring, and coaching other people.",
+      "Communication": "Named communication sub-skills — active listening, negotiation, presentation, storytelling.",
+      "Craft & Domain": "Deep, role-specific expertise — contract drafting, art direction, financial modeling."
+    };
+    document.getElementById("codexSkills").innerHTML = '<div class="grid-2">' + skillCats.map(function (c) {
+      return '<div class="codex-entry"><div class="codex-term">' + c + '</div><div class="codex-def">' + skillDefs[c] + '</div></div>';
+    }).join("") + '</div>';
+  }
+
+  /* ================= INIT ================= */
+  renderCommandBar();
+  switchView("overview");
+  renderOverview();
+  renderRoster();
+  renderProfile();
+  renderWork();
+  renderCoaching();
+  renderFinance();
+  renderReports();
+  renderCodex();
 })();
